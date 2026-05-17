@@ -1,0 +1,15 @@
+/**
+ * Shared types between API and Web applications.
+ * Define DTOs, interfaces, and constants used by both apps here.
+ */
+
+export interface ApiResponse<T> {
+  data: T;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

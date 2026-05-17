@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":pinAllExceptPeerDependencies",
+    ":semanticCommits",
+    ":separateMultipleMajorReleases",
+    "group:monorepos",
+    "group:recommended"
+  ],
+  "schedule": ["before 7am on Monday"],
+  "timezone": "Europe/Amsterdam",
+  "labels": ["dependencies", "automated"],
+  "rangeStrategy": "pin",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on the first day of the month"]
+  },
+  "packageRules": [
+    {
+      "groupName": "NestJS",
+      "matchPackagePatterns": ["^@nestjs/"],
+      "automerge": false
+    },
+    {
+      "groupName": "Testing",
+      "matchPackageNames": ["jest", "ts-jest"],
+      "matchPackagePatterns": ["^@types/jest"],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "groupName": "Linting",
+      "matchPackageNames": ["eslint", "prettier"],
+      "matchPackagePatterns": ["^@typescript-eslint/"],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "branch"
+    }
+  ]
+}

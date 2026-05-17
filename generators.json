@@ -1,0 +1,24 @@
+{
+  "generators": {
+    "add": {
+      "factory": "./dist/generators/add-recipe/generator",
+      "schema": "./src/generators/add-recipe/schema.json",
+      "description": "Add a recipe to an existing project"
+    },
+    "list": {
+      "factory": "./dist/generators/list-recipes/generator",
+      "schema": "./src/generators/list-recipes/schema.json",
+      "description": "List installed and available recipes"
+    },
+    "remove": {
+      "factory": "./dist/generators/remove-recipe/generator",
+      "schema": "./src/generators/remove-recipe/schema.json",
+      "description": "Remove a recipe from an existing project"
+    },
+    "migrate": {
+      "factory": "./dist/generators/migrate-recipe/generator",
+      "schema": "./src/generators/migrate-recipe/schema.json",
+      "description": "Migrate from one recipe to another within the same category"
+    }
+  }
+}

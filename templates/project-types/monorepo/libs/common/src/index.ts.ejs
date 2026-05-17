@@ -1,0 +1,17 @@
+/**
+ * @<%= packageScope ?? name %>/common
+ *
+ * Shared utilities, DTOs, interfaces, and constants used across apps.
+ */
+
+export interface ApiResponse<T> {
+  data: T;
+}
+
+export interface ErrorResponse {
+  message: string;
+  errorCode: string;
+  traceCode: string;
+  path: string;
+  timestamp: string;
+}

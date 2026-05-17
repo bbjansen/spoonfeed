@@ -1,0 +1,41 @@
+version: 0.2
+
+env:
+  variables:
+    NODE_VERSION: '22'
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: $NODE_VERSION
+    commands:
+      - npm install -g pnpm@10
+      - pnpm install --frozen-lockfile
+
+  pre_build:
+    commands:
+      - pnpm lint
+      - pnpm exec tsc --noEmit
+      - pnpm test:unit
+      - pnpm test:integration
+
+  build:
+    commands:
+      - pnpm build
+
+  post_build:
+    commands:
+      - pnpm audit --audit-level=high || true
+
+artifacts:
+  files:
+    - dist/**/*
+    - package.json
+    - pnpm-lock.yaml
+    - node_modules/**/*
+  discard-paths: no
+
+cache:
+  paths:
+    - node_modules/**/*
+    - .pnpm-store/**/*

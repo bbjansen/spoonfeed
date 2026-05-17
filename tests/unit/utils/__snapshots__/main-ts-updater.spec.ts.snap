@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`main-ts-updater snapshots should match snapshot after inserting swagger block into main.ts 1`] = `
+"import { NestFactory } from '@nestjs/core';
+import { AppModule } from '@/app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.enableShutdownHooks();
+
+  const port = process.env.PORT ?? 3000;
+
+  // --- swagger-setup start ---
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('API')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
+  // --- swagger-setup end ---
+
+  await app.listen(port, '0.0.0.0');
+}
+
+void bootstrap();
+"
+`;

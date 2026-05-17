@@ -1,0 +1,44 @@
+---
+description: Authentication and authorization patterns
+globs: ["**/*.guard.ts", "**/*.strategy.ts", "**/*.controller.ts", "**/auth/**"]
+---
+
+# Auth Rules
+
+## Route Protection
+- All routes are protected by default via a global `JwtAuthGuard`
+- Use `@Public()` decorator to mark routes that skip authentication
+- Never disable the global guard — use `@Public()` for open endpoints
+
+```ts
+@Public()
+@Post('login')
+login(@Body() dto: LoginDto) { ... }
+```
+
+## User Extraction
+- Use `@CurrentUser()` parameter decorator to get the authenticated user
+- Never read from `request.user` directly in controllers
+
+```ts
+@Get('profile')
+getProfile(@CurrentUser() user: JwtPayload) {
+  return this.userService.findById(user.sub);
+}
+```
+
+## JWT Flow
+- Access tokens are short-lived (15 minutes default)
+- Refresh tokens are long-lived and stored securely
+- The `/auth/refresh` endpoint issues a new access token from a valid refresh token
+- Revoke refresh tokens on password change or logout
+
+## Authorization
+- Use custom guards for role-based or permission-based access
+- Place authorization guards after authentication: `@UseGuards(JwtAuthGuard, RolesGuard)`
+- Use `@Roles()` decorator to declare required roles on handlers
+
+## Passwords
+- Hash passwords with bcrypt (minimum 10 rounds)
+- Never log or return password fields
+- Exclude password from entity serialization using `class-transformer` `@Exclude()`

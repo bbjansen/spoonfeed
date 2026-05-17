@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`module-updater snapshots should match snapshot after adding 1 recipe 1`] = `
+"import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { SwaggerModule } from "@/infrastructure/swagger/swagger.module";
+
+@Module({
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+        }),
+        SwaggerModule
+    ],
+})
+export class AppModule { }
+"
+`;
+
+exports[`module-updater snapshots should match snapshot after adding 2 recipes 1`] = `
+"import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { SwaggerModule } from "@/infrastructure/swagger/swagger.module";
+import { LoggingModule } from "@/infrastructure/logging/logging.module";
+
+@Module({
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+        }),
+        SwaggerModule,
+        LoggingModule
+    ],
+})
+export class AppModule { }
+"
+`;
+
+exports[`module-updater snapshots should match snapshot after adding 3 recipes 1`] = `
+"import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { SwaggerModule } from "@/infrastructure/swagger/swagger.module";
+import { LoggingModule } from "@/infrastructure/logging/logging.module";
+import { HealthModule } from "@/infrastructure/health/health.module";
+
+@Module({
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+        }),
+        SwaggerModule,
+        LoggingModule,
+        HealthModule
+    ],
+})
+export class AppModule { }
+"
+`;

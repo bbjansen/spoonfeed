@@ -1,0 +1,32 @@
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { Context } from 'aws-lambda';
+import awsLambdaFastify from '@fastify/aws-lambda';
+import { AppModule } from './app.module';
+
+let cachedProxy: (event: unknown, context: Context) => Promise<unknown>;
+
+async function bootstrap() {
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  await app.init();
+
+  const fastifyInstance = app.getHttpAdapter().getInstance();
+  return awsLambdaFastify(fastifyInstance);
+}
+
+export const handler = async (event: unknown, context: Context) => {
+  if (!cachedProxy) {
+    cachedProxy = await bootstrap();
+  }
+  return cachedProxy(event, context);
+};

@@ -1,0 +1,8 @@
+import { Command, CommandRunner } from 'nest-commander';
+
+@Command({ name: 'hello', description: 'Say hello' })
+export class HelloCommand extends CommandRunner {
+  async run(): Promise<void> {
+    process.stdout.write('Hello from <%= name %>!\n');
+  }
+}

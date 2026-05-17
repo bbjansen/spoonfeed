@@ -1,0 +1,48 @@
+---
+description: Swagger/OpenAPI conventions
+globs: ["**/*.controller.ts", "**/*.dto.ts"]
+---
+
+# Swagger Rules
+
+## DTOs
+- Add `@ApiProperty()` to every property in request and response DTOs
+- Include `description`, `example`, and `type` in `@ApiProperty()` when not obvious
+- Use `@ApiPropertyOptional()` for optional fields
+- Mark enums with `{ enum: MyEnum }` in the decorator
+
+```ts
+export class CreateUserDto {
+  @ApiProperty({ description: 'User email address', example: 'user@example.com' })
+  @IsEmail()
+  email: string;
+
+  @ApiPropertyOptional({ description: 'Display name', example: 'Jane Doe' })
+  @IsString()
+  @IsOptional()
+  name?: string;
+}
+```
+
+## Controllers
+- Add `@ApiTags('<resource>')` at the class level to group endpoints
+- Add `@ApiOperation({ summary: '...' })` to every handler method
+- Use `@ApiResponse()` for non-2xx responses (400, 401, 404, etc.)
+- Use `@ApiParam()` for path parameters and `@ApiQuery()` for query parameters
+
+```ts
+@ApiTags('users')
+@Controller('users')
+export class UserController {
+  @Get(':id')
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  findOne(@Param('id') id: string) { ... }
+}
+```
+
+## General
+- Do not use `@ApiExcludeEndpoint()` unless the route is truly internal
+- Keep operation summaries short (under 60 characters)
+- Use consistent naming: plural nouns for resource tags (e.g. `users`, `invoices`)

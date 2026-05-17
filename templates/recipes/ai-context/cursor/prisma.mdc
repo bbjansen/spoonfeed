@@ -1,0 +1,43 @@
+---
+description: Prisma patterns and conventions
+globs: ["**/prisma/**", "**/*.prisma", "**/*.repository.ts", "**/*.service.ts"]
+---
+
+# Prisma Rules
+
+## Schema Design
+- Define models in `prisma/schema.prisma`
+- Use `@id @default(uuid())` for primary keys
+- Use `@map()` and `@@map()` to control database table/column names
+- Add `createdAt` and `updatedAt` fields to all models
+- Define explicit relation names when a model has multiple relations to the same table
+
+```prisma
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  posts     Post[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+```
+
+## Client Usage
+- Inject `PrismaService` (extends `PrismaClient`) via NestJS DI
+- Never instantiate `PrismaClient` directly in application code
+- Use `select` or `include` explicitly — avoid fetching unnecessary relations
+- Use transactions (`prisma.$transaction()`) for multi-step writes
+
+## Migrations
+- Run `pnpm prisma migrate dev --name <kebab-case-name>` during development
+- Run `pnpm prisma migrate deploy` in CI/production
+- Never edit generated migration SQL after it has been applied
+- Always run `pnpm prisma generate` after schema changes
+
+## Error Handling
+- Catch `PrismaClientKnownRequestError` for constraint violations
+- Use error codes: `P2002` (unique), `P2025` (not found), `P2003` (foreign key)
+- Map Prisma errors to NestJS exceptions in the service layer

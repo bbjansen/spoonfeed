@@ -1,0 +1,33 @@
+# <%= packageScope ? packageScope + '/' + name : name %>
+
+Nx monorepo workspace.
+
+## Structure
+
+```
+apps/          # Application projects
+libs/          # Shared libraries
+  common/      # Shared DTOs, interfaces, constants
+```
+
+## Commands
+
+```bash
+# Run a specific app
+pnpm nx serve <app-name>
+
+# Build all affected projects
+pnpm nx affected --target=build
+
+# Test all affected projects
+pnpm nx affected --target=test
+
+# Generate a new NestJS app
+pnpm nx g @nx/nest:application apps/<app-name>
+
+# Generate a new library
+pnpm nx g @nx/js:library libs/<lib-name>
+
+# View dependency graph
+pnpm nx graph
+```

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "cli": "nx",
+  "$id": "MigrateRecipe",
+  "title": "Migrate Recipe",
+  "type": "object",
+  "properties": {
+    "from": {
+      "type": "string",
+      "description": "Recipe ID to remove (currently installed)",
+      "x-prompt": "Which recipe do you want to migrate FROM?"
+    },
+    "to": {
+      "type": "string",
+      "description": "Recipe ID to add (replacement)",
+      "x-prompt": "Which recipe do you want to migrate TO?"
+    },
+    "project": {
+      "type": "string",
+      "description": "Target project (for monorepo)"
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "description": "Preview changes without applying"
+    }
+  },
+  "required": ["from", "to"]
+}

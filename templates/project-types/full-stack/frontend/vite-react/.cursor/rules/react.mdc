@@ -1,0 +1,12 @@
+# React (Vite) Rules
+
+- Functional components only, no class components
+- Use TypeScript strict mode
+- Custom hooks for reusable logic — prefix with use (useAuth, useFetch)
+- State management: React Context for simple, Zustand/Jotai for complex
+- Side effects in useEffect with proper cleanup
+- Memoize expensive computations with useMemo, callbacks with useCallback
+- Avoid prop drilling — use Context or composition
+- Error boundaries for component-level error handling
+- Lazy load routes with React.lazy + Suspense
+- Forms: react-hook-form for complex, controlled components for simple

@@ -1,0 +1,52 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Amsterdam
+    open-pull-requests-limit: 10
+    versioning-strategy: increase
+    labels:
+      - dependencies
+      - automated
+    commit-message:
+      prefix: 'chore(deps):'
+      include: scope
+    groups:
+      nestjs:
+        patterns:
+          - '@nestjs/*'
+      testing:
+        patterns:
+          - jest
+          - '@types/jest'
+          - ts-jest
+      linting:
+        patterns:
+          - eslint
+          - '@typescript-eslint/*'
+          - prettier
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - ci
+      - automated
+    commit-message:
+      prefix: 'ci(deps):'
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
+    labels:
+      - docker
+      - automated
+    commit-message:
+      prefix: 'build(docker):'

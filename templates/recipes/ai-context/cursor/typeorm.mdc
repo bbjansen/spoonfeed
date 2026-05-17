@@ -1,0 +1,49 @@
+---
+description: TypeORM patterns and conventions
+globs: ["**/*.entity.ts", "**/*.repository.ts", "**/migrations/**"]
+---
+
+# TypeORM Rules
+
+## Entities
+- One entity per file, suffix `.entity.ts`
+- Use `@Entity()` with an explicit table name: `@Entity('users')`
+- Always define a primary key with `@PrimaryGeneratedColumn('uuid')`
+- Use `@Column()` with explicit types for non-string columns
+- Add `@CreateDateColumn()` and `@UpdateDateColumn()` to all entities
+- Define relations with explicit join columns and cascade options
+
+```ts
+@Entity('users')
+export class UserEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  email: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+```
+
+## Repositories
+- Use the repository pattern via `@InjectRepository()`
+- Never call `getRepository()` or `getManager()` directly
+- Create custom repository methods for complex queries
+- Use QueryBuilder for queries involving joins or conditions beyond simple `find`
+
+## Migrations
+- Never modify an applied migration — create a new one
+- Implement both `up()` and `down()` methods
+- Use `migration:generate` to auto-generate from entity changes
+- Test both directions locally before committing
+
+## Queries
+- Use parameterized queries — never interpolate user input into SQL
+- Prefer `findOne({ where: { ... } })` over `findOneBy()` for clarity
+- Use `select` to limit returned columns in performance-sensitive queries
+- Add `@Index()` decorators for frequently queried columns

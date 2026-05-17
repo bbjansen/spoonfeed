@@ -1,0 +1,22 @@
+service: <%= name %>
+
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-west-1'}
+  memorySize: 256
+  timeout: 30
+  environment:
+    NODE_ENV: ${self:provider.stage}
+
+functions:
+  api:
+    handler: dist/main.handler
+    events:
+      - httpApi: '*'
+
+plugins:
+  - serverless-offline

@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "build": "nx run-many --target=build",
+    "test": "nx run-many --target=test",
+    "lint": "nx run-many --target=lint",
+    "graph": "nx graph"
+  },
+  "devDependencies": {
+    "nx": "21.3.2",
+    "@nx/nest": "21.3.2",
+    "@nx/js": "21.3.2"
+  }
+}

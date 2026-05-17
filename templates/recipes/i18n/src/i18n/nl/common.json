@@ -1,0 +1,7 @@
+{
+  "HELLO": "Hallo",
+  "NOT_FOUND": "Bron niet gevonden",
+  "VALIDATION_ERROR": "Validatie mislukt",
+  "UNAUTHORIZED": "Authenticatie vereist",
+  "FORBIDDEN": "Toegang geweigerd"
+}

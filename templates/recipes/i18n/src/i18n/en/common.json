@@ -1,0 +1,7 @@
+{
+  "HELLO": "Hello",
+  "NOT_FOUND": "Resource not found",
+  "VALIDATION_ERROR": "Validation failed",
+  "UNAUTHORIZED": "Authentication required",
+  "FORBIDDEN": "Access denied"
+}

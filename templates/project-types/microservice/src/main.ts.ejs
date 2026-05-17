@@ -1,0 +1,15 @@
+import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions } from '@nestjs/microservices';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+    // Transport configuration is injected by the selected transport recipe
+  });
+
+  app.enableShutdownHooks();
+
+  await app.listen();
+}
+
+void bootstrap();

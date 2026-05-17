@@ -1,0 +1,53 @@
+import { defineConfig } from 'vitepress';
+
+export default defineConfig({
+  title: '<%= projectName %>',
+  description: '<%= projectDescription %>',
+  base: '/<%= repoName %>/',
+  themeConfig: {
+    nav: [
+      { text: 'Home', link: '/' },
+      { text: 'Guide', link: '/guide/' },
+      { text: 'API Reference', link: '/api/' },
+    ],
+    sidebar: {
+      '/guide/': [
+        {
+          text: 'Getting Started',
+          items: [
+            { text: 'Introduction', link: '/guide/' },
+            { text: 'Installation', link: '/guide/installation' },
+            { text: 'Configuration', link: '/guide/configuration' },
+          ],
+        },
+        {
+          text: 'Architecture',
+          items: [
+            { text: 'Project Structure', link: '/guide/structure' },
+            { text: 'Modules', link: '/guide/modules' },
+          ],
+        },
+      ],
+      '/api/': [
+        {
+          text: 'API Reference',
+          items: [
+            { text: 'Overview', link: '/api/' },
+            { text: 'Authentication', link: '/api/authentication' },
+            { text: 'Endpoints', link: '/api/endpoints' },
+          ],
+        },
+      ],
+    },
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/<%= githubOrg %>/<%= repoName %>' },
+    ],
+    search: {
+      provider: 'local',
+    },
+    editLink: {
+      pattern: 'https://github.com/<%= githubOrg %>/<%= repoName %>/edit/main/docs/:path',
+      text: 'Edit this page on GitHub',
+    },
+  },
+});

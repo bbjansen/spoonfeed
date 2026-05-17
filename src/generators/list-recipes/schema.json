@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "cli": "nx",
+  "$id": "ListRecipes",
+  "title": "List Recipes",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "description": "Filter by category"
+    },
+    "project": {
+      "type": "string",
+      "description": "Target project (for monorepo)"
+    },
+    "json": {
+      "type": "boolean",
+      "default": false,
+      "description": "Output as JSON"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+Hypersolid Proprietary License
+Version 1.0
+
+Copyright (c) [year] Hypersolid B.V. All rights reserved.
+
+1. DEFINITIONS
+
+"Software" means the source code, object code, documentation, and any
+associated materials provided under this license.
+
+"Licensee" means the individual or entity that has been granted a license
+to use the Software by Hypersolid B.V.
+
+"Authorized Purpose" means internal business use by the Licensee, including
+development, testing, and deployment of applications built using the Software.
+
+2. GRANT OF LICENSE
+
+Subject to the terms of this license, Hypersolid B.V. grants the Licensee a
+non-exclusive, non-transferable, revocable license to use the Software solely
+for the Authorized Purpose.
+
+3. RESTRICTIONS
+
+The Licensee SHALL NOT:
+
+a) Redistribute, sublicense, sell, lease, or otherwise transfer the Software
+   or any portion thereof to any third party.
+
+b) Modify, adapt, translate, reverse engineer, decompile, or disassemble the
+   Software, except to the extent expressly permitted by applicable law.
+
+c) Remove, alter, or obscure any proprietary notices, labels, or marks on
+   the Software.
+
+d) Use the Software to create a competing product or service.
+
+e) Use the Software in any manner that violates applicable laws or regulations.
+
+4. INTELLECTUAL PROPERTY
+
+The Software and all copies thereof are proprietary to Hypersolid B.V. and
+title thereto remains in Hypersolid B.V. All applicable rights to patents,
+copyrights, trademarks, and trade secrets in the Software are and shall
+remain in Hypersolid B.V.
+
+5. CONFIDENTIALITY
+
+The Licensee agrees to maintain the confidentiality of the Software and not
+to disclose the Software to any third party without the prior written consent
+of Hypersolid B.V.
+
+6. WARRANTY DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+HYPERSOLID B.V. BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+7. TERMINATION
+
+This license is effective until terminated. Hypersolid B.V. may terminate
+this license at any time if the Licensee breaches any provision hereof.
+Upon termination, the Licensee must destroy all copies of the Software in
+their possession.
+
+8. GOVERNING LAW
+
+This license shall be governed by and construed in accordance with the laws
+of the Netherlands, without regard to its conflict of laws principles.
+
+9. CONTACT
+
+For licensing inquiries: licensing@example.com

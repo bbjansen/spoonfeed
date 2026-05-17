@@ -1,0 +1,58 @@
+---
+description: Testing patterns and conventions
+globs: ["**/*.spec.ts", "**/*.e2e-spec.ts", "tests/**"]
+---
+
+# Testing Rules
+
+## File Naming and Location
+- Tests live in `tests/` at the project root, mirroring `src/` structure
+- Unit tests: `tests/unit/<path>/<name>.spec.ts`
+- Integration tests: `tests/integration/<path>/<name>.integration.spec.ts`
+- E2E tests: `tests/e2e/<name>.e2e-spec.ts`
+- Test factories: `tests/factories/<name>.factory.ts`
+
+## Unit Tests
+- Test every public method — happy path, edge cases, error paths
+- Mock only external dependencies (database, HTTP, third-party SDKs)
+- Never mock code you own — use real instances
+- Use `Test.createTestingModule()` from `@nestjs/testing`
+
+```ts
+const module = await Test.createTestingModule({
+  providers: [
+    UserService,
+    { provide: UserRepository, useValue: mockRepository },
+  ],
+}).compile();
+```
+
+## Integration Tests
+- Use Testcontainers to spin up real databases
+- Test the full NestJS module with real providers
+- Focus on data persistence and cross-service interactions
+- Clean up test data between tests
+
+## E2E Tests
+- Test the HTTP boundary only — use `supertest` against the running app
+- Verify status codes, response shapes, and headers
+- Do not test internal implementation details
+
+## Factories
+- Create test data builders in `tests/factories/`
+- Use the builder pattern with sensible defaults
+- Override only the fields relevant to each test
+
+```ts
+export const createUserFixture = (overrides?: Partial<User>): User => ({
+  id: randomUUID(),
+  email: 'test@example.com',
+  name: 'Test User',
+  ...overrides,
+});
+```
+
+## General
+- Avoid `any` in test code — use proper types
+- One `describe` block per method, nested `it` blocks per scenario
+- Clean up side effects (files, database rows) in `afterEach` or `afterAll`
