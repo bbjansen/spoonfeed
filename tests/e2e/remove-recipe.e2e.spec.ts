@@ -176,7 +176,7 @@ describe('remove-recipe E2E', () => {
     flushTreeChanges(tree, outputDir, diskFiles);
 
     // Step 5: Reinstall to clean lockfile
-    run('pnpm', ['install'], outputDir);
+    run('pnpm', ['install', '--no-frozen-lockfile'], outputDir);
 
     // Step 6: Build after removal — should succeed
     run('pnpm', ['exec', 'tsc', '--noEmit'], outputDir);
