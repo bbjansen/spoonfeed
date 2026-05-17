@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.1.2](https://github.com/bbjansen/spoonfeeder/compare/spoonfeeder-v0.1.1...spoonfeeder-v0.1.2) (2026-05-17)
+
+
+### Features
+
+* initial release of spoonfeeder nestjs scaffolder ([aacfb8e](https://github.com/bbjansen/spoonfeeder/commit/aacfb8e2e8234b94aee2df5fc53923b093569e6d))
+* prepare v0.1.0 for public release ([ef87cee](https://github.com/bbjansen/spoonfeeder/commit/ef87cee78606dc712c1c43b76054fe8f5f57bec2))
+
+
+### Bug Fixes
+
+* generate project in current directory instead of parent ([#1](https://github.com/bbjansen/spoonfeeder/issues/1)) ([7a3acb6](https://github.com/bbjansen/spoonfeeder/commit/7a3acb69f6f530692200b926d52d7870f54b152b))
+
 ## [0.1.1](https://github.com/bbjansen/spoonfeeder/compare/spoonfeeder-v0.1.0...spoonfeeder-v0.1.1) (2026-05-17)
 
 

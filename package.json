@@ -1,6 +1,6 @@
 {
   "name": "spoonfeeder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "NestJS project scaffolder with 112 composable recipes",
   "author": "B.B. Jansen <bobjansen@pm.me>",
   "license": "MIT",
