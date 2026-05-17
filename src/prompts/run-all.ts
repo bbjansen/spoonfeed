@@ -77,9 +77,8 @@ export async function runAllPrompts(registry: RecipeRegistry): Promise<ProjectCo
   const deploymentTargets = await promptDeployment();
   const ciCdProvider = await promptCiCd();
 
-  // Default output to parent directory to avoid generating inside the boilerplate repo
   const baseDir = process.cwd();
-  const outputDir = path.resolve(baseDir, '..', name);
+  const outputDir = path.resolve(baseDir, name);
 
   const config: ProjectConfig = {
     name,
