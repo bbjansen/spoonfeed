@@ -1,19 +1,19 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
 import type { Request, Response, NextFunction } from 'express';
-<% } else { %>
+<% } else { -%>
 import { FastifyRequest, FastifyReply } from 'fastify';
-<% } %>
+<% } -%>
 
 @Injectable()
 export class RequestLoggingMiddleware implements NestMiddleware {
   private readonly logger = new Logger('HTTP');
 
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
   use(req: Request, res: Response, next: NextFunction): void {
-<% } else { %>
+<% } else { -%>
   use(req: FastifyRequest['raw'], res: FastifyReply['raw'], next: () => void): void {
-<% } %>
+<% } -%>
     const start = performance.now();
     const { method, url } = req;
     const userAgent = req.headers['user-agent'] || '-';

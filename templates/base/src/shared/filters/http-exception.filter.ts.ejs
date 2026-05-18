@@ -6,11 +6,11 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
 import type { Request, Response } from 'express';
-<% } else { %>
+<% } else { -%>
 import { FastifyReply, FastifyRequest } from 'fastify';
-<% } %>
+<% } -%>
 import { ApplicationError } from '@/shared/errors/application.error';
 
 const HTTP_STATUS_CODES: Record<number, string> = {
@@ -44,13 +44,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-<% } else { %>
+<% } else { -%>
     const response = ctx.getResponse<FastifyReply>();
     const request = ctx.getRequest<FastifyRequest>();
-<% } %>
+<% } -%>
 
     const { status, body } = this.buildErrorResponse(exception, request);
 
@@ -61,18 +61,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       );
     }
 
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
     response.status(status).header('content-type', 'application/problem+json').json(body);
-<% } else { %>
+<% } else { -%>
     void response.code(status).header('content-type', 'application/problem+json').send(body);
-<% } %>
+<% } -%>
   }
 
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
   private buildErrorResponse(exception: unknown, request: Request) {
-<% } else { %>
+<% } else { -%>
   private buildErrorResponse(exception: unknown, request: FastifyRequest) {
-<% } %>
+<% } -%>
     if (exception instanceof ApplicationError) {
       const errorCode = exception.errorCode;
       return {

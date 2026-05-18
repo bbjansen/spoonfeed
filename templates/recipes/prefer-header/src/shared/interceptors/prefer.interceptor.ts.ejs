@@ -1,11 +1,11 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
 import type { Request, Response } from 'express';
-<% } else { %>
+<% } else { -%>
 import { FastifyRequest, FastifyReply } from 'fastify';
-<% } %>
+<% } -%>
 
 @Injectable()
 export class PreferInterceptor implements NestInterceptor {
@@ -22,7 +22,11 @@ export class PreferInterceptor implements NestInterceptor {
           const returnPref = prefer.get('return');
           if (returnPref === 'minimal') {
             applied.push('return=minimal');
+<% if (httpAdapter === 'express') { -%>
+            void response.status(204);
+<% } else { -%>
             void response.code(204);
+<% } -%>
             return undefined;
           }
           if (returnPref === 'representation') {

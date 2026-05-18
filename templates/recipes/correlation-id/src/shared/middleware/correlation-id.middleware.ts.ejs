@@ -1,10 +1,10 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { AsyncLocalStorage } from 'node:async_hooks';
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
 import type { Request, Response, NextFunction } from 'express';
-<% } else { %>
+<% } else { -%>
 import { FastifyRequest, FastifyReply } from 'fastify';
-<% } %>
+<% } -%>
 
 const CORRELATION_HEADER = 'x-correlation-id';
 
@@ -12,11 +12,11 @@ export const correlationStorage = new AsyncLocalStorage<string>();
 
 @Injectable()
 export class CorrelationIdMiddleware implements NestMiddleware {
-<% if (httpAdapter === 'express') { %>
+<% if (httpAdapter === 'express') { -%>
   use(req: Request, res: Response, next: NextFunction): void {
-<% } else { %>
+<% } else { -%>
   use(req: FastifyRequest['raw'], res: FastifyReply['raw'], next: () => void): void {
-<% } %>
+<% } -%>
     const incoming = req.headers[CORRELATION_HEADER] as string | undefined;
     const correlationId = incoming || crypto.randomUUID();
 

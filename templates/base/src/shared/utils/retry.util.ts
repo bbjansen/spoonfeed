@@ -28,5 +28,5 @@ export async function retry<T>(fn: () => Promise<T>, options: RetryOptions): Pro
     }
   }
 
-  throw lastError;
+  throw lastError as Error;
 }

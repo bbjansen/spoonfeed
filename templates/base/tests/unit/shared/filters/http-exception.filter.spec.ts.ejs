@@ -4,10 +4,17 @@ import { NotFoundError } from '@/shared/errors/not-found.error';
 import { ApplicationError } from '@/shared/errors/application.error';
 import { ValidationError } from '@/shared/errors/validation.error';
 
-const mockSend = jest.fn<void, [Record<string, unknown>]>();
+<% if (httpAdapter === 'express') { -%>
+const mockJson = jest.fn();
+const mockHeader = jest.fn().mockReturnValue({ json: mockJson });
+const mockStatus = jest.fn().mockReturnValue({ header: mockHeader });
+const mockResponse = { status: mockStatus };
+<% } else { -%>
+const mockSend = jest.fn();
 const mockHeader = jest.fn().mockReturnValue({ send: mockSend });
 const mockCode = jest.fn().mockReturnValue({ header: mockHeader });
 const mockResponse = { code: mockCode };
+<% } -%>
 const mockRequest = { method: 'GET', url: '/test' };
 
 const createMockHost = (): ArgumentsHost =>
@@ -39,12 +46,21 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      expect(mockStatus).toHaveBeenCalledTimes(1);
+      expect(mockStatus).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+      expect(mockHeader).toHaveBeenCalledWith('content-type', 'application/problem+json');
+      expect(mockJson).toHaveBeenCalledTimes(1);
+
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       expect(mockCode).toHaveBeenCalledTimes(1);
       expect(mockCode).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
       expect(mockHeader).toHaveBeenCalledWith('content-type', 'application/problem+json');
       expect(mockSend).toHaveBeenCalledTimes(1);
 
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       expect(body.type).toBe('urn:error:not-found');
       expect(body.title).toBe('Not Found');
       expect(body.status).toBe(HttpStatus.NOT_FOUND);
@@ -61,10 +77,17 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      expect(mockStatus).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+      expect(mockHeader).toHaveBeenCalledWith('content-type', 'application/problem+json');
+
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       expect(mockCode).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
       expect(mockHeader).toHaveBeenCalledWith('content-type', 'application/problem+json');
 
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       expect(body.type).toBe('urn:error:internal-error');
       expect(body.title).toBe('Internal Server Error');
       expect(body.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -78,7 +101,11 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       expect(body.type).toBe('urn:error:http-error');
       expect(body.title).toBe('Error');
       expect(body.status).toBe(418);
@@ -91,10 +118,17 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      expect(mockStatus).toHaveBeenCalledWith(404);
+      expect(mockHeader).toHaveBeenCalledWith('content-type', 'application/problem+json');
+
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       expect(mockCode).toHaveBeenCalledWith(404);
       expect(mockHeader).toHaveBeenCalledWith('content-type', 'application/problem+json');
 
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       expect(body.type).toBe('urn:error:not-found');
       expect(body.title).toBe('Not Found');
       expect(body.status).toBe(404);
@@ -113,9 +147,15 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      expect(mockStatus).toHaveBeenCalledWith(400);
+
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       expect(mockCode).toHaveBeenCalledWith(400);
 
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       expect(body.type).toBe('urn:error:validation-error');
       expect(body.title).toBe('Bad Request');
       expect(body.status).toBe(400);
@@ -137,7 +177,11 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       const debug = body.debugInformation as Record<string, unknown>;
       expect(debug).not.toBeNull();
       expect(debug.userId).toBe(42);
@@ -156,7 +200,11 @@ describe('GlobalExceptionFilter', () => {
 
       productionFilter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       expect(body.debugInformation).toBeNull();
     });
 
@@ -166,7 +214,11 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       const debug = body.debugInformation as Record<string, unknown>;
       expect(debug).not.toBeNull();
       expect(debug.stack).toBeDefined();
@@ -181,7 +233,11 @@ describe('GlobalExceptionFilter', () => {
 
       productionFilter.catch(exception, host);
 
+<% if (httpAdapter === 'express') { -%>
+      const body = mockJson.mock.calls[0][0];
+<% } else { -%>
       const body = mockSend.mock.calls[0][0];
+<% } -%>
       expect(body.debugInformation).toBeNull();
     });
   });
