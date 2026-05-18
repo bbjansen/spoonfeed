@@ -169,17 +169,76 @@ export function removeBlockFromString(
   content = before + after;
 
   for (const specifier of importModuleSpecifiers) {
-    const importRegex = new RegExp(
-      `^import\\s+.*from\\s+['"]${escapeRegex(specifier)}['"];?\\s*\\n?`,
-      'gm',
-    );
-    content = content.replace(importRegex, '');
+    content = removeImportBySpecifier(content, specifier);
   }
 
   content = content.replace(/\n{3,}/g, '\n\n');
   content = content.trimEnd() + '\n';
 
   return content;
+}
+
+/**
+ * Removes an import statement for the given module specifier, handling both
+ * single-line and multi-line (Prettier-formatted) imports.
+ *
+ * Strategy: walk lines to find spans that form a complete import from the
+ * target specifier, then splice them out.
+ */
+function removeImportBySpecifier(source: string, specifier: string): string {
+  const lines = source.split('\n');
+  const result: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Check if this line starts an import statement
+    if (/^\s*import\s/.test(line)) {
+      // Accumulate lines until we find the end of the import statement (a line containing `from` + semicolon or just a semicolon)
+      const importLines = [line];
+      let j = i;
+
+      // A complete import has `from '...'` (with optional semicolon). Keep
+      // accumulating lines until we find one that contains the `from` clause
+      // or a bare semicolon closing a side-effect import.
+      while (!isImportComplete(importLines.join('\n')) && j + 1 < lines.length) {
+        j++;
+        importLines.push(lines[j]);
+      }
+
+      const fullImport = importLines.join('\n');
+
+      // Check if this import is for the target specifier
+      const specifierPattern = new RegExp(
+        `from\\s+['"]${escapeRegex(specifier)}['"]`,
+      );
+
+      if (specifierPattern.test(fullImport)) {
+        // Skip all lines of this import (don't add to result)
+        i = j + 1;
+        continue;
+      }
+    }
+
+    result.push(line);
+    i++;
+  }
+
+  return result.join('\n');
+}
+
+/**
+ * Determines whether a (possibly partial) import statement string is complete.
+ * An import is complete when it contains a `from '...'` clause followed by an
+ * optional semicolon, or is a side-effect import like `import 'foo';`.
+ */
+function isImportComplete(text: string): boolean {
+  // Side-effect import: import 'module';
+  if (/^\s*import\s+['"]/.test(text) && /['"];?\s*$/.test(text)) return true;
+  // Standard import with from clause
+  if (/from\s+['"][^'"]*['"];?\s*$/.test(text)) return true;
+  return false;
 }
 
 function escapeRegex(str: string): string {

@@ -1,3 +1,6 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'fs-extra';
 import { Tree, updateJson, formatFiles, logger } from '@nx/devkit';
 import type { RemoveRecipeGeneratorSchema } from './schema.js';
 import { RecipeRegistry } from '../../recipes/registry.js';
@@ -8,7 +11,16 @@ import type { SpoonfeedManifest } from '../../utils/recipe-manifest.js';
 import { removeModuleImportFromString } from '../../utils/module-updater.js';
 import { removeBlockFromString } from '../../utils/main-ts-updater.js';
 
+const generatorDir = path.dirname(fileURLToPath(import.meta.url));
+
+interface PackageFragment {
+  scripts?: Record<string, string>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+}
+
 interface PackageJson {
+  scripts?: Record<string, string>;
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
   [key: string]: unknown;
@@ -114,6 +126,69 @@ export default async function removeRecipeGenerator(
     }
   }
 
+  // 4a. Remove package-fragment.json scripts (and extra deps) from package.json
+  if (recipeDef?.templateDir) {
+    const templatesDir = path.resolve(generatorDir, '..', '..', '..', 'templates');
+    const fragmentPath = path.join(templatesDir, 'recipes', recipeDef.templateDir, 'package-fragment.json');
+    if (await fs.pathExists(fragmentPath)) {
+      const fragment: PackageFragment = await fs.readJson(fragmentPath);
+
+      // Build set of script keys contributed by OTHER installed recipes' fragments
+      const otherRecipeIds = installedIds.filter((id) => id !== recipeId);
+      const sharedScriptKeys = new Set<string>();
+      for (const otherId of otherRecipeIds) {
+        const otherDef = registry.get(otherId as RecipeId);
+        if (!otherDef?.templateDir) continue;
+        const otherFragPath = path.join(templatesDir, 'recipes', otherDef.templateDir, 'package-fragment.json');
+        if (await fs.pathExists(otherFragPath)) {
+          const otherFrag: PackageFragment = await fs.readJson(otherFragPath);
+          if (otherFrag.scripts) {
+            for (const key of Object.keys(otherFrag.scripts)) sharedScriptKeys.add(key);
+          }
+        }
+      }
+
+      // Build set of deps used by OTHER installed recipes so we don't remove shared deps
+      const sharedFragDeps = new Set<string>();
+      for (const otherId of otherRecipeIds) {
+        const otherDef = registry.get(otherId as RecipeId);
+        if (!otherDef) continue;
+        for (const dep of Object.keys(
+          isExpress && otherDef.expressDependencies
+            ? otherDef.expressDependencies
+            : otherDef.dependencies,
+        )) sharedFragDeps.add(dep);
+        for (const dep of Object.keys(otherDef.devDependencies)) sharedFragDeps.add(dep);
+      }
+
+      updateJson<PackageJson>(tree, 'package.json', (json) => {
+        if (fragment.scripts) {
+          for (const key of Object.keys(fragment.scripts)) {
+            if (!sharedScriptKeys.has(key)) {
+              delete json.scripts?.[key];
+            }
+          }
+        }
+        if (fragment.dependencies) {
+          for (const dep of Object.keys(fragment.dependencies)) {
+            if (!sharedFragDeps.has(dep)) {
+              delete json.dependencies?.[dep];
+            }
+          }
+        }
+        if (fragment.devDependencies) {
+          for (const dep of Object.keys(fragment.devDependencies)) {
+            if (!sharedFragDeps.has(dep)) {
+              delete json.devDependencies?.[dep];
+            }
+          }
+        }
+        return json;
+      });
+      logger.info(`  Removed package-fragment.json entries for '${recipeId}'`);
+    }
+  }
+
   // 5. Remove module import from app.module.ts
   if (recipeEntry.moduleImport) {
     const appModulePath = `${srcPrefix}/app.module.ts`;
@@ -143,8 +218,29 @@ export default async function removeRecipeGenerator(
         (imp: { moduleSpecifier: string }) => imp.moduleSpecifier,
       ) ?? [];
 
+      // Build set of specifiers still needed by other installed recipes
+      const otherSpecifiers = new Set<string>();
+      for (const otherId of Object.keys(manifest.recipes)) {
+        if (otherId === recipeId) continue;
+        const otherEntry = manifest.recipes[otherId];
+        if (!otherEntry.mainTsBlocks?.length) continue;
+        const otherDef = registry.get(otherId as RecipeId);
+        if (!otherDef) continue;
+        const otherSetup = isExpress && otherDef.expressMainTsSetup
+          ? otherDef.expressMainTsSetup
+          : otherDef.mainTsSetup;
+        for (const imp of otherSetup?.block?.imports ?? []) {
+          otherSpecifiers.add(imp.moduleSpecifier);
+        }
+      }
+
+      // Filter out specifiers still needed by other recipes
+      const safeSpecifiers = importSpecifiers.filter(
+        (s: string) => !otherSpecifiers.has(s),
+      );
+
       for (const blockId of recipeEntry.mainTsBlocks) {
-        mainContent = removeBlockFromString(mainContent, blockId, importSpecifiers);
+        mainContent = removeBlockFromString(mainContent, blockId, safeSpecifiers);
         logger.info(`  Removed main.ts block: ${blockId}`);
       }
 
@@ -166,6 +262,15 @@ export default async function removeRecipeGenerator(
       if (startIdx !== -1 && endIdx !== -1) {
         content = content.slice(0, startIdx) + content.slice(endIdx + endMarker.length);
         content = content.replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';
+
+        // Promote shared vars that referenced this section back to active lines
+        const removedSectionName = recipeEntry.envSection;
+        const sharedVarRegex = new RegExp(
+          `^# (\\S+=\\S+) \\(shared with ${escapeRegexString(removedSectionName)}\\)$`,
+          'gm',
+        );
+        content = content.replace(sharedVarRegex, '$1');
+
         tree.write(envPath, content);
         logger.info(`  Removed env section: ${recipeEntry.envSection}`);
       }
@@ -214,6 +319,13 @@ function removeAiContextSection(tree: Tree, filePath: string, recipeId: string):
   content = content.replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';
   tree.write(filePath, content);
   logger.info(`  Removed AI context section from: ${filePath}`);
+}
+
+/**
+ * Escapes special regex characters in a string so it can be used in a RegExp constructor.
+ */
+function escapeRegexString(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
