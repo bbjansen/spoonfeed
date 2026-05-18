@@ -1,14 +1,14 @@
 <p align="center">
-  <img src=".github/banner.svg" alt="spoonfeeder" width="100%" />
+  <img src=".github/banner.svg" alt="spoonfeed" width="100%" />
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/spoonfeeder"><img src="https://img.shields.io/npm/v/spoonfeeder?style=flat-square" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/spoonfeeder"><img src="https://img.shields.io/npm/dm/spoonfeeder?style=flat-square" alt="npm downloads" /></a>
-  <a href="https://github.com/bbjansen/spoonfeeder/blob/main/LICENSE"><img src="https://img.shields.io/github/license/bbjansen/spoonfeeder?style=flat-square" alt="license" /></a>
-  <a href="https://nodejs.org/"><img src="https://img.shields.io/node/v/spoonfeeder?style=flat-square" alt="node version" /></a>
-  <a href="https://github.com/bbjansen/spoonfeeder/actions"><img src="https://img.shields.io/github/actions/workflow/status/bbjansen/spoonfeeder/ci.yml?style=flat-square&label=CI" alt="CI" /></a>
-  <a href="https://github.com/bbjansen/spoonfeeder/blob/main/docs/contributing.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs welcome" /></a>
+  <a href="https://www.npmjs.com/package/spoonfeed"><img src="https://img.shields.io/npm/v/spoonfeed?style=flat-square" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/spoonfeed"><img src="https://img.shields.io/npm/dm/spoonfeed?style=flat-square" alt="npm downloads" /></a>
+  <a href="https://github.com/bbjansen/spoonfeed/blob/main/LICENSE"><img src="https://img.shields.io/github/license/bbjansen/spoonfeed?style=flat-square" alt="license" /></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/node/v/spoonfeed?style=flat-square" alt="node version" /></a>
+  <a href="https://github.com/bbjansen/spoonfeed/actions"><img src="https://img.shields.io/github/actions/workflow/status/bbjansen/spoonfeed/ci.yml?style=flat-square&label=CI" alt="CI" /></a>
+  <a href="https://github.com/bbjansen/spoonfeed/blob/main/docs/contributing.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs welcome" /></a>
 </p>
 
 <p align="center">
@@ -50,13 +50,13 @@ Interactive CLI that scaffolds production-ready, AI-friendly NestJS projects wit
 ## Quick Start
 
 ```bash
-npx spoonfeeder
+npx spoonfeed
 ```
 
 Or with pnpm:
 
 ```bash
-pnpm dlx spoonfeeder
+pnpm dlx spoonfeed
 ```
 
 One command. The CLI walks you through project name, type, cloud provider, and recipe selection, then generates everything to disk.
@@ -64,7 +64,7 @@ One command. The CLI walks you through project name, type, cloud provider, and r
 ## What It Looks Like
 
 ```
-┌  spoonfeeder — NestJS Project Generator
+┌  spoonfeed — NestJS Project Generator
 │
 ◇  Project name
 │  my-api
@@ -165,7 +165,7 @@ Each recipe ships its own dependencies, environment variables, configuration mod
 
 ## AI-Ready Projects
 
-Every generated project ships with AI assistant context tailored to your exact stack. When you select recipes, spoonfeeder generates project-specific instructions for three major AI coding assistants:
+Every generated project ships with AI assistant context tailored to your exact stack. When you select recipes, spoonfeed generates project-specific instructions for three major AI coding assistants:
 
 | File | Assistant | What it contains |
 |------|-----------|-----------------|
@@ -190,7 +190,7 @@ Every generated project includes:
 - **Nx generators** — Add, remove, or migrate recipes after scaffolding without manual wiring
 - **CI/CD templates** — GitHub Actions workflows for test, lint, build, and deploy
 
-No runtime dependency on spoonfeeder. The generated project is a standard NestJS application. Eject and own your code from day one.
+No runtime dependency on spoonfeed. The generated project is a standard NestJS application. Eject and own your code from day one.
 
 ### How It Works
 
@@ -201,35 +201,35 @@ No runtime dependency on spoonfeeder. The generated project is a standard NestJS
 
 ## Post-Scaffolding (Nx Generators)
 
-Recipes are not frozen at scaffolding time. Spoonfeeder ships Nx generators so you can evolve your stack after project creation:
+Recipes are not frozen at scaffolding time. Spoonfeed ships Nx generators so you can evolve your stack after project creation:
 
 ```bash
 # Add a recipe to an existing project
-nx g spoonfeeder:add --recipe=swagger
+nx g spoonfeed:add --recipe=swagger
 
 # Remove a recipe cleanly (deps, config, source files, tests)
-nx g spoonfeeder:remove --recipe=swagger
+nx g spoonfeed:remove --recipe=swagger
 
 # Migrate between compatible recipes
-nx g spoonfeeder:migrate --from=typeorm-postgres --to=prisma
+nx g spoonfeed:migrate --from=typeorm-postgres --to=prisma
 
 # List all available and installed recipes
-nx g spoonfeeder:list
+nx g spoonfeed:list
 ```
 
 Add what you need, remove what you don't. No lock-in.
 
 ## Documentation
 
-Full docs at **[bbjansen.github.io/spoonfeeder](https://bbjansen.github.io/spoonfeeder/)**
+Full docs at **[bbjansen.github.io/spoonfeed](https://bbjansen.github.io/spoonfeed/)**
 
 | Section | What it covers |
 | ------- | -------------- |
-| [Quick Start](https://bbjansen.github.io/spoonfeeder/getting-started/quick-start/) | Installation, CLI walkthrough, generated structure |
-| [Project Types](https://bbjansen.github.io/spoonfeeder/getting-started/project-types/) | Deep dive into each of the 7 archetypes |
-| [Recipe Catalog](https://bbjansen.github.io/spoonfeeder/recipes/all/) | Full list of all 112 recipes with dependencies |
-| [Nx Generators](https://bbjansen.github.io/spoonfeeder/generators/) | Add, remove, migrate, and list recipes |
-| [Architecture](https://bbjansen.github.io/spoonfeeder/architecture/) | Generator pipeline, error handling, standards |
+| [Quick Start](https://bbjansen.github.io/spoonfeed/getting-started/quick-start/) | Installation, CLI walkthrough, generated structure |
+| [Project Types](https://bbjansen.github.io/spoonfeed/getting-started/project-types/) | Deep dive into each of the 7 archetypes |
+| [Recipe Catalog](https://bbjansen.github.io/spoonfeed/recipes/all/) | Full list of all 112 recipes with dependencies |
+| [Nx Generators](https://bbjansen.github.io/spoonfeed/generators/) | Add, remove, migrate, and list recipes |
+| [Architecture](https://bbjansen.github.io/spoonfeed/architecture/) | Generator pipeline, error handling, standards |
 
 ## Requirements
 
@@ -238,7 +238,7 @@ Full docs at **[bbjansen.github.io/spoonfeeder](https://bbjansen.github.io/spoon
 
 ## Contributing
 
-Contributions welcome. See [docs/contributing.md](docs/contributing.md) for setup instructions, branch naming conventions, and the development workflow.
+Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, branch naming conventions, and the development workflow.
 
 ## Author
 

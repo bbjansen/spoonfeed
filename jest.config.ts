@@ -21,7 +21,7 @@ const config: Config = {
       transform: { '^.+\\.ts$': swcTransform },
       moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1',
-        '^@spoonfeeder/(.*)$': '<rootDir>/src/$1',
+        '^@spoonfeed/(.*)$': '<rootDir>/src/$1',
       },
       testEnvironment: 'node',
     },
@@ -32,7 +32,7 @@ const config: Config = {
       transform: { '^.+\\.ts$': swcTransform },
       moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1',
-        '^@spoonfeeder/(.*)$': '<rootDir>/src/$1',
+        '^@spoonfeed/(.*)$': '<rootDir>/src/$1',
       },
       testEnvironment: 'node',
       testTimeout: 30000,
@@ -44,7 +44,7 @@ const config: Config = {
       transform: { '^.+\\.ts$': swcTransform },
       moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1',
-        '^@spoonfeeder/(.*)$': '<rootDir>/src/$1',
+        '^@spoonfeed/(.*)$': '<rootDir>/src/$1',
       },
       testEnvironment: 'node',
       testTimeout: 120000,

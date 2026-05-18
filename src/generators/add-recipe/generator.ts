@@ -7,7 +7,7 @@ import type { ProjectType, RecipeDefinition, RecipeId } from '../../types.js';
 import { addModuleImportToString } from '../../utils/module-updater.js';
 import { insertBlockToString } from '../../utils/main-ts-updater.js';
 import type { BlockDefinition } from '../../utils/main-ts-updater.js';
-import type { SpoonfeederManifest } from '../../utils/recipe-manifest.js';
+import type { SpoonfeedManifest } from '../../utils/recipe-manifest.js';
 
 interface PackageJson {
   dependencies: Record<string, string>;
@@ -27,17 +27,17 @@ export default async function addRecipeGenerator(
 
   if (!recipe) {
     throw new Error(
-      `Recipe '${recipeId}' not found. Run 'nx g spoonfeeder:list' to see available recipes.`,
+      `Recipe '${recipeId}' not found. Run 'nx g spoonfeed:list' to see available recipes.`,
     );
   }
 
   // Read manifest
-  const manifestPath = '.spoonfeeder.json';
+  const manifestPath = '.spoonfeed.json';
   if (!tree.exists(manifestPath)) {
-    throw new Error('.spoonfeeder.json not found. Is this a spoonfeeder-generated project?');
+    throw new Error('.spoonfeed.json not found. Is this a spoonfeed-generated project?');
   }
 
-  const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeederManifest;
+  const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeedManifest;
 
   // Check if already installed
   if (manifest.recipes[recipeId]) {
@@ -163,9 +163,9 @@ export default async function addRecipeGenerator(
     const claudePath = 'CLAUDE.md';
     if (tree.exists(claudePath)) {
       let content = tree.read(claudePath, 'utf-8')!;
-      const marker = `<!-- @spoonfeeder:${recipeId} -->`;
+      const marker = `<!-- @spoonfeed:${recipeId} -->`;
       if (!content.includes(marker)) {
-        content += `\n${marker}\n${recipe.claudeMdSection}\n<!-- @spoonfeeder:end:${recipeId} -->\n`;
+        content += `\n${marker}\n${recipe.claudeMdSection}\n<!-- @spoonfeed:end:${recipeId} -->\n`;
         tree.write(claudePath, content);
       }
     }
@@ -175,9 +175,9 @@ export default async function addRecipeGenerator(
     const copilotPath = '.github/copilot-instructions.md';
     if (tree.exists(copilotPath)) {
       let content = tree.read(copilotPath, 'utf-8')!;
-      const marker = `<!-- @spoonfeeder:${recipeId} -->`;
+      const marker = `<!-- @spoonfeed:${recipeId} -->`;
       if (!content.includes(marker)) {
-        content += `\n${marker}\n${recipe.copilotInstructions}\n<!-- @spoonfeeder:end:${recipeId} -->\n`;
+        content += `\n${marker}\n${recipe.copilotInstructions}\n<!-- @spoonfeed:end:${recipeId} -->\n`;
         tree.write(copilotPath, content);
       }
     }
@@ -191,10 +191,10 @@ export default async function addRecipeGenerator(
   }
 
   // 5. Update manifest
-  updateJson<SpoonfeederManifest>(tree, manifestPath, (json) => {
+  updateJson<SpoonfeedManifest>(tree, manifestPath, (json) => {
     json.recipes[recipeId] = {
       installedAt: new Date().toISOString(),
-      version: json.spoonfeederVersion ?? '0.0.1',
+      version: json.spoonfeedVersion ?? '0.0.1',
       files: copiedFiles,
       ...(recipe.moduleImport && { moduleImport: recipe.moduleImport }),
       ...(recipe.mainTsSetup && { mainTsBlocks: [recipe.mainTsSetup.blockId] }),

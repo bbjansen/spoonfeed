@@ -4,7 +4,7 @@
 
 **Goal:** Implement `add-recipe` and `list-recipes` Nx generators with file copying, package.json merging, env var appending, AI context updates, and manifest tracking — without AST transforms (no app.module.ts modification yet).
 
-**Architecture:** The generators live inside `` alongside the existing CLI scaffolder. They reuse the existing `RecipeRegistry`, `RecipeDefinition`, and `detectConflicts` infrastructure. A `.spoonfeeder.json` manifest file in each generated project tracks which recipes are installed. Phase 1 handles recipes that only add files (devcontainer, changelog, license, docker-compose-dev, load-testing, etc.) — AST-modifying recipes come in Phase 2.
+**Architecture:** The generators live inside `` alongside the existing CLI scaffolder. They reuse the existing `RecipeRegistry`, `RecipeDefinition`, and `detectConflicts` infrastructure. A `.spoonfeed.json` manifest file in each generated project tracks which recipes are installed. Phase 1 handles recipes that only add files (devcontainer, changelog, license, docker-compose-dev, load-testing, etc.) — AST-modifying recipes come in Phase 2.
 
 **Tech Stack:** `@nx/devkit` (generator API, Tree virtual filesystem), `ts-morph` (installed but used in Phase 2), existing `RecipeDefinition` types, `fs-extra`, `ejs`
 
@@ -35,7 +35,7 @@ This is **Phase 1 of 4**:
 | `src/generators/add-recipe/schema.d.ts`       | TypeScript types for schema                                          |
 | `src/generators/list-recipes/generator.ts`    | List-recipes generator logic                                         |
 | `src/generators/list-recipes/schema.json`     | Nx schema definition                                                 |
-| `src/utils/recipe-manifest.ts`                | Read/write .spoonfeeder.json                                         |
+| `src/utils/recipe-manifest.ts`                | Read/write .spoonfeed.json                                         |
 | `src/utils/env-updater.ts`                    | Add/remove sections in .env.example                                  |
 | `src/utils/ai-context-updater.ts`             | Add/remove sections in CLAUDE.md, .cursorrules, copilot-instructions |
 | `tests/unit/utils/recipe-manifest.spec.ts`    | Manifest unit tests                                                  |
@@ -61,7 +61,7 @@ This is **Phase 1 of 4**:
 - [ ] **Step 1: Install @nx/devkit and ts-morph**
 
 ```bash
-pnpm --filter spoonfeeder add -E @nx/devkit ts-morph
+pnpm --filter spoonfeed add -E @nx/devkit ts-morph
 ```
 
 - [ ] **Step 2: Add generators field to package.json**
@@ -96,7 +96,7 @@ Create `generators.json`:
 - [ ] **Step 4: Verify build**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.
@@ -105,12 +105,12 @@ Expected: compiles with no errors.
 
 ```bash
 git add package.json generators.json pnpm-lock.yaml
-git commit -m "chore(spoonfeeder): add nx devkit and generators entry point"
+git commit -m "chore(spoonfeed): add nx devkit and generators entry point"
 ```
 
 ---
 
-## Task 2: Recipe manifest (read/write .spoonfeeder.json)
+## Task 2: Recipe manifest (read/write .spoonfeed.json)
 
 **Files:**
 
@@ -130,8 +130,8 @@ import {
   writeManifest,
   addRecipeToManifest,
   isRecipeInstalled,
-  type SpoonfeederManifest,
-} from '@spoonfeeder/utils/recipe-manifest';
+  type SpoonfeedManifest,
+} from '@spoonfeed/utils/recipe-manifest';
 
 describe('recipe-manifest', () => {
   let tmpDir: string;
@@ -139,7 +139,7 @@ describe('recipe-manifest', () => {
 
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'manifest-test-'));
-    manifestPath = path.join(tmpDir, '.spoonfeeder.json');
+    manifestPath = path.join(tmpDir, '.spoonfeed.json');
   });
 
   afterEach(() => {
@@ -151,10 +151,10 @@ describe('recipe-manifest', () => {
   });
 
   it('should write and read a manifest', () => {
-    const manifest: SpoonfeederManifest = {
+    const manifest: SpoonfeedManifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {},
     };
@@ -165,10 +165,10 @@ describe('recipe-manifest', () => {
   });
 
   it('should add a recipe to the manifest', () => {
-    const manifest: SpoonfeederManifest = {
+    const manifest: SpoonfeedManifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {},
     };
@@ -186,10 +186,10 @@ describe('recipe-manifest', () => {
   });
 
   it('should check if a recipe is installed', () => {
-    const manifest: SpoonfeederManifest = {
+    const manifest: SpoonfeedManifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {
         swagger: {
@@ -235,23 +235,23 @@ export interface RecipeManifestEntry {
   };
 }
 
-export interface SpoonfeederManifest {
+export interface SpoonfeedManifest {
   projectType: string;
   cloudProvider: string;
-  spoonfeederVersion: string;
+  spoonfeedVersion: string;
   generatedAt: string;
   recipes: Record<string, RecipeManifestEntry>;
 }
 
-const MANIFEST_FILE = '.spoonfeeder.json';
+const MANIFEST_FILE = '.spoonfeed.json';
 
-export function readManifest(projectDir: string): SpoonfeederManifest | null {
+export function readManifest(projectDir: string): SpoonfeedManifest | null {
   const filePath = path.join(projectDir, MANIFEST_FILE);
   if (!fs.existsSync(filePath)) return null;
-  return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as SpoonfeederManifest;
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as SpoonfeedManifest;
 }
 
-export function writeManifest(projectDir: string, manifest: SpoonfeederManifest): void {
+export function writeManifest(projectDir: string, manifest: SpoonfeedManifest): void {
   const filePath = path.join(projectDir, MANIFEST_FILE);
   fs.writeFileSync(filePath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
 }
@@ -262,12 +262,12 @@ export function addRecipeToManifest(
   entry: Omit<RecipeManifestEntry, 'installedAt' | 'version'>,
 ): void {
   const manifest = readManifest(projectDir);
-  if (!manifest) throw new Error('.spoonfeeder.json not found');
+  if (!manifest) throw new Error('.spoonfeed.json not found');
 
   manifest.recipes[recipeId] = {
     ...entry,
     installedAt: new Date().toISOString(),
-    version: manifest.spoonfeederVersion,
+    version: manifest.spoonfeedVersion,
   };
 
   writeManifest(projectDir, manifest);
@@ -275,7 +275,7 @@ export function addRecipeToManifest(
 
 export function removeRecipeFromManifest(projectDir: string, recipeId: string): void {
   const manifest = readManifest(projectDir);
-  if (!manifest) throw new Error('.spoonfeeder.json not found');
+  if (!manifest) throw new Error('.spoonfeed.json not found');
 
   delete manifest.recipes[recipeId];
   writeManifest(projectDir, manifest);
@@ -304,7 +304,7 @@ Expected: 4 tests pass.
 
 ```bash
 git add src/utils/recipe-manifest.ts tests/unit/utils/recipe-manifest.spec.ts
-git commit -m "feat(spoonfeeder): add recipe manifest read/write utilities"
+git commit -m "feat(spoonfeed): add recipe manifest read/write utilities"
 ```
 
 ---
@@ -324,7 +324,7 @@ Create `tests/unit/utils/env-updater.spec.ts`:
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { addEnvSection, removeEnvSection } from '@spoonfeeder/utils/env-updater';
+import { addEnvSection, removeEnvSection } from '@spoonfeed/utils/env-updater';
 
 describe('env-updater', () => {
   let tmpDir: string;
@@ -444,7 +444,7 @@ Expected: 3 tests pass.
 
 ```bash
 git add src/utils/env-updater.ts tests/unit/utils/env-updater.spec.ts
-git commit -m "feat(spoonfeeder): add env section updater for generators"
+git commit -m "feat(spoonfeed): add env section updater for generators"
 ```
 
 ---
@@ -464,7 +464,7 @@ Create `tests/unit/utils/ai-context-updater.spec.ts`:
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { addClaudeMdSection, removeClaudeMdSection } from '@spoonfeeder/utils/ai-context-updater';
+import { addClaudeMdSection, removeClaudeMdSection } from '@spoonfeed/utils/ai-context-updater';
 
 describe('ai-context-updater', () => {
   let tmpDir: string;
@@ -494,7 +494,7 @@ describe('ai-context-updater', () => {
     addClaudeMdSection(tmpDir, 'swagger', '## Swagger\nDocs at /api/docs.');
 
     const content = fs.readFileSync(path.join(tmpDir, 'CLAUDE.md'), 'utf-8');
-    const matches = content.match(/<!-- @spoonfeeder:swagger -->/g);
+    const matches = content.match(/<!-- @spoonfeed:swagger -->/g);
     expect(matches).toHaveLength(1);
   });
 
@@ -521,10 +521,10 @@ function addSection(filePath: string, recipeId: string, content: string): void {
   if (!fs.existsSync(filePath)) return;
 
   let fileContent = fs.readFileSync(filePath, 'utf-8');
-  const marker = `<!-- @spoonfeeder:${recipeId} -->`;
+  const marker = `<!-- @spoonfeed:${recipeId} -->`;
   if (fileContent.includes(marker)) return;
 
-  const section = `\n${marker}\n${content}\n<!-- @spoonfeeder:end:${recipeId} -->\n`;
+  const section = `\n${marker}\n${content}\n<!-- @spoonfeed:end:${recipeId} -->\n`;
   fileContent = fileContent.trimEnd() + '\n' + section;
   fs.writeFileSync(filePath, fileContent, 'utf-8');
 }
@@ -533,8 +533,8 @@ function removeSection(filePath: string, recipeId: string): void {
   if (!fs.existsSync(filePath)) return;
 
   let fileContent = fs.readFileSync(filePath, 'utf-8');
-  const startMarker = `<!-- @spoonfeeder:${recipeId} -->`;
-  const endMarker = `<!-- @spoonfeeder:end:${recipeId} -->`;
+  const startMarker = `<!-- @spoonfeed:${recipeId} -->`;
+  const endMarker = `<!-- @spoonfeed:end:${recipeId} -->`;
 
   const startIdx = fileContent.indexOf(startMarker);
   const endIdx = fileContent.indexOf(endMarker);
@@ -589,7 +589,7 @@ Expected: 3 tests pass.
 
 ```bash
 git add src/utils/ai-context-updater.ts tests/unit/utils/ai-context-updater.spec.ts
-git commit -m "feat(spoonfeeder): add ai context updater for generators"
+git commit -m "feat(spoonfeed): add ai context updater for generators"
 ```
 
 ---
@@ -655,7 +655,7 @@ export interface AddRecipeGeneratorSchema {
 
 ```bash
 git add src/generators/add-recipe/
-git commit -m "feat(spoonfeeder): add add-recipe generator schema"
+git commit -m "feat(spoonfeed): add add-recipe generator schema"
 ```
 
 ---
@@ -691,14 +691,14 @@ export default async function addRecipeGenerator(
 
   if (!recipe) {
     throw new Error(
-      `Recipe '${recipeId}' not found. Run 'nx g spoonfeeder:list' to see available recipes.`,
+      `Recipe '${recipeId}' not found. Run 'nx g spoonfeed:list' to see available recipes.`,
     );
   }
 
   // Read manifest
-  const manifestPath = '.spoonfeeder.json';
+  const manifestPath = '.spoonfeed.json';
   if (!tree.exists(manifestPath)) {
-    throw new Error('.spoonfeeder.json not found. Is this a spoonfeeder-generated project?');
+    throw new Error('.spoonfeed.json not found. Is this a spoonfeed-generated project?');
   }
 
   const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as {
@@ -796,9 +796,9 @@ export default async function addRecipeGenerator(
     const claudePath = 'CLAUDE.md';
     if (tree.exists(claudePath)) {
       let content = tree.read(claudePath, 'utf-8')!;
-      const marker = `<!-- @spoonfeeder:${recipeId} -->`;
+      const marker = `<!-- @spoonfeed:${recipeId} -->`;
       if (!content.includes(marker)) {
-        content += `\n${marker}\n${recipe.claudeMdSection}\n<!-- @spoonfeeder:end:${recipeId} -->\n`;
+        content += `\n${marker}\n${recipe.claudeMdSection}\n<!-- @spoonfeed:end:${recipeId} -->\n`;
         tree.write(claudePath, content);
       }
     }
@@ -808,7 +808,7 @@ export default async function addRecipeGenerator(
   updateJson(tree, manifestPath, (json) => {
     json.recipes[recipeId] = {
       installedAt: new Date().toISOString(),
-      version: json.spoonfeederVersion ?? '0.0.1',
+      version: json.spoonfeedVersion ?? '0.0.1',
       files: copiedFiles,
     };
     return json;
@@ -826,7 +826,7 @@ export default async function addRecipeGenerator(
 - [ ] **Step 2: Verify build**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.
@@ -835,7 +835,7 @@ Expected: compiles with no errors.
 
 ```bash
 git add src/generators/add-recipe/generator.ts
-git commit -m "feat(spoonfeeder): implement add-recipe generator (phase 1, no ast)"
+git commit -m "feat(spoonfeed): implement add-recipe generator (phase 1, no ast)"
 ```
 
 ---
@@ -896,7 +896,7 @@ export default function listRecipesGenerator(tree: Tree, options: ListRecipesSch
   registerAllRecipes(registry);
 
   // Read manifest
-  const manifestPath = '.spoonfeeder.json';
+  const manifestPath = '.spoonfeed.json';
   const manifest = tree.exists(manifestPath)
     ? (JSON.parse(tree.read(manifestPath, 'utf-8')!) as {
         projectType: string;
@@ -955,28 +955,28 @@ export default function listRecipesGenerator(tree: Tree, options: ListRecipesSch
     logger.info(`  ... and ${available.length - 20} more`);
   }
 
-  logger.info('\nUse: nx g spoonfeeder:add <recipe>');
+  logger.info('\nUse: nx g spoonfeed:add <recipe>');
 }
 ```
 
 - [ ] **Step 3: Verify build**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add src/generators/list-recipes/
-git commit -m "feat(spoonfeeder): implement list-recipes generator"
+git commit -m "feat(spoonfeed): implement list-recipes generator"
 ```
 
 ---
 
-## Task 8: Update initial project generation to create .spoonfeeder.json
+## Task 8: Update initial project generation to create .spoonfeed.json
 
-The existing generator in `src/generator/generator.ts` needs to create a `.spoonfeeder.json` manifest in every generated project so the Nx generators can work.
+The existing generator in `src/generator/generator.ts` needs to create a `.spoonfeed.json` manifest in every generated project so the Nx generators can work.
 
 **Files:**
 
@@ -987,11 +987,11 @@ The existing generator in `src/generator/generator.ts` needs to create a `.spoon
 In `generator.ts`, after step 9 (AI context assembly) and before `s.stop()`, add:
 
 ```typescript
-// 10. Create .spoonfeeder.json manifest
+// 10. Create .spoonfeed.json manifest
 const manifest = {
   projectType: config.projectType,
   cloudProvider: config.cloudProvider,
-  spoonfeederVersion: '0.0.1',
+  spoonfeedVersion: '0.0.1',
   generatedAt: new Date().toISOString(),
   recipes: Object.fromEntries(
     config.recipes.map((id) => [
@@ -1004,20 +1004,20 @@ const manifest = {
     ]),
   ),
 };
-await fs.writeJson(path.join(outputDir, '.spoonfeeder.json'), manifest, { spaces: 2 });
+await fs.writeJson(path.join(outputDir, '.spoonfeed.json'), manifest, { spaces: 2 });
 ```
 
 - [ ] **Step 2: Verify build and existing tests**
 
 ```bash
-pnpm --filter spoonfeeder build && pnpm test:unit --passWithNoTests
+pnpm --filter spoonfeed build && pnpm test:unit --passWithNoTests
 ```
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add src/generator/generator.ts
-git commit -m "feat(spoonfeeder): generate .spoonfeeder.json manifest in new projects"
+git commit -m "feat(spoonfeed): generate .spoonfeed.json manifest in new projects"
 ```
 
 ---
@@ -1032,10 +1032,10 @@ pnpm test:unit --passWithNoTests
 
 Expected: all tests pass (53 existing + 10 new = ~63 total).
 
-- [ ] **Step 2: Build spoonfeeder**
+- [ ] **Step 2: Build spoonfeed**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.

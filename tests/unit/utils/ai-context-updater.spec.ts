@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { addClaudeMdSection, removeClaudeMdSection } from '@spoonfeeder/utils/ai-context-updater';
+import { addClaudeMdSection, removeClaudeMdSection } from '@spoonfeed/utils/ai-context-updater';
 
 describe('ai-context-updater', () => {
   let tmpDir: string;
@@ -31,7 +31,7 @@ describe('ai-context-updater', () => {
     addClaudeMdSection(tmpDir, 'swagger', '## Swagger\nDocs at /api/docs.');
 
     const content = fs.readFileSync(path.join(tmpDir, 'CLAUDE.md'), 'utf-8');
-    const matches = content.match(/<!-- @spoonfeeder:swagger -->/g);
+    const matches = content.match(/<!-- @spoonfeed:swagger -->/g);
     expect(matches).toHaveLength(1);
   });
 

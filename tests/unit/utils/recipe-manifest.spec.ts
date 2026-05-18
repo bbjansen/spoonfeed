@@ -6,8 +6,8 @@ import {
   writeManifest,
   addRecipeToManifest,
   isRecipeInstalled,
-  type SpoonfeederManifest,
-} from '@spoonfeeder/utils/recipe-manifest';
+  type SpoonfeedManifest,
+} from '@spoonfeed/utils/recipe-manifest';
 
 describe('recipe-manifest', () => {
   let tmpDir: string;
@@ -25,10 +25,10 @@ describe('recipe-manifest', () => {
   });
 
   it('should write and read a manifest', () => {
-    const manifest: SpoonfeederManifest = {
+    const manifest: SpoonfeedManifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {},
     };
@@ -39,10 +39,10 @@ describe('recipe-manifest', () => {
   });
 
   it('should add a recipe to the manifest', () => {
-    const manifest: SpoonfeederManifest = {
+    const manifest: SpoonfeedManifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {},
     };
@@ -60,10 +60,10 @@ describe('recipe-manifest', () => {
   });
 
   it('should check if a recipe is installed', () => {
-    const manifest: SpoonfeederManifest = {
+    const manifest: SpoonfeedManifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {
         swagger: {

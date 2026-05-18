@@ -3,11 +3,11 @@ import * as path from 'node:path';
 import * as os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
-import { generate } from '@spoonfeeder/generator/generator';
-import { RecipeRegistry } from '@spoonfeeder/recipes/registry';
-import { registerAllRecipes } from '@spoonfeeder/recipes/definitions';
-import removeRecipeGenerator from '@spoonfeeder/generators/remove-recipe/generator';
-import type { ProjectConfig } from '@spoonfeeder/types';
+import { generate } from '@spoonfeed/generator/generator';
+import { RecipeRegistry } from '@spoonfeed/recipes/registry';
+import { registerAllRecipes } from '@spoonfeed/recipes/definitions';
+import removeRecipeGenerator from '@spoonfeed/generators/remove-recipe/generator';
+import type { ProjectConfig } from '@spoonfeed/types';
 import type { Tree } from '@nx/devkit';
 
 jest.setTimeout(120_000);
@@ -129,7 +129,7 @@ describe('remove-recipe E2E', () => {
   let outputDir: string;
 
   beforeAll(async () => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-e2e-remove-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-e2e-remove-'));
     outputDir = path.join(tmpDir, 'e2e-remove-test');
 
     // Generate a project with swagger recipe
@@ -149,7 +149,7 @@ describe('remove-recipe E2E', () => {
   it('should add swagger, build, remove swagger, build — both succeed', async () => {
     // Step 1: Verify base project files exist
     expect(fs.existsSync(path.join(outputDir, 'package.json'))).toBe(true);
-    expect(fs.existsSync(path.join(outputDir, '.spoonfeeder.json'))).toBe(true);
+    expect(fs.existsSync(path.join(outputDir, '.spoonfeed.json'))).toBe(true);
     expect(fs.existsSync(path.join(outputDir, 'src/app.module.ts'))).toBe(true);
 
     // Step 2: Install dependencies
@@ -160,7 +160,7 @@ describe('remove-recipe E2E', () => {
 
     // Verify swagger is in manifest
     const manifestAfterAdd = JSON.parse(
-      fs.readFileSync(path.join(outputDir, '.spoonfeeder.json'), 'utf-8'),
+      fs.readFileSync(path.join(outputDir, '.spoonfeed.json'), 'utf-8'),
     ) as { recipes: Record<string, unknown> };
     expect(manifestAfterAdd.recipes['swagger']).toBeDefined();
 
@@ -183,7 +183,7 @@ describe('remove-recipe E2E', () => {
 
     // Verify swagger is gone from manifest
     const manifestAfterRemove = JSON.parse(
-      fs.readFileSync(path.join(outputDir, '.spoonfeeder.json'), 'utf-8'),
+      fs.readFileSync(path.join(outputDir, '.spoonfeed.json'), 'utf-8'),
     ) as { recipes: Record<string, unknown> };
     expect(manifestAfterRemove.recipes['swagger']).toBeUndefined();
 

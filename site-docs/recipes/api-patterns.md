@@ -1,6 +1,6 @@
 # API Pattern Recipes
 
-Spoonfeeder provides 15 API pattern recipes covering pagination, versioning, patching, caching, real-time streaming, file handling, and more. These recipes add common HTTP API behaviors through decorators, pipes, interceptors, and middleware — no boilerplate wiring required.
+spoonfeed provides 15 API pattern recipes covering pagination, versioning, patching, caching, real-time streaming, file handling, and more. These recipes add common HTTP API behaviors through decorators, pipes, interceptors, and middleware — no boilerplate wiring required.
 
 !!! tip "Recommended combinations"
     - **Production-ready REST API:** `pagination` + `filtering` + `api-versioning` + `correlation-id` + `http-caching`

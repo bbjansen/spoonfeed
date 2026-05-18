@@ -1,5 +1,5 @@
-import { findDependents } from '@spoonfeeder/utils/dependency-checker';
-import type { RecipeDefinition, RecipeId } from '@spoonfeeder/types';
+import { findDependents } from '@spoonfeed/utils/dependency-checker';
+import type { RecipeDefinition, RecipeId } from '@spoonfeed/types';
 
 function makeRecipe(overrides: Partial<RecipeDefinition> & { id: RecipeId }): RecipeDefinition {
   return {

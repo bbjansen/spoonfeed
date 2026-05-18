@@ -1,6 +1,6 @@
 # Cloud — AWS Recipes
 
-Spoonfeeder provides 12 AWS recipes covering messaging, storage, databases, authentication, secrets, logging, caching, and CDN. Use these recipes when deploying to AWS infrastructure. Each recipe wraps an official `@aws-sdk/*` v3 client behind a NestJS injectable service with structured logging built in.
+spoonfeed provides 12 AWS recipes covering messaging, storage, databases, authentication, secrets, logging, caching, and CDN. Use these recipes when deploying to AWS infrastructure. Each recipe wraps an official `@aws-sdk/*` v3 client behind a NestJS injectable service with structured logging built in.
 
 All AWS recipes use the official `@aws-sdk/*` v3 packages with exact version pinning.
 

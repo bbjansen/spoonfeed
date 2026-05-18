@@ -1,6 +1,6 @@
 # Project Types
 
-Spoonfeeder supports seven project archetypes. Each type determines the bootstrap code in `main.ts`, the directory structure, default recipes, and which recipes are compatible.
+spoonfeed supports seven project archetypes. Each type determines the bootstrap code in `main.ts`, the directory structure, default recipes, and which recipes are compatible.
 
 ## HTTP REST API
 

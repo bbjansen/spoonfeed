@@ -1,11 +1,11 @@
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { Tree, readJson } from '@nx/devkit';
-import addRecipeGenerator from '@spoonfeeder/generators/add-recipe/generator';
-import removeRecipeGenerator from '@spoonfeeder/generators/remove-recipe/generator';
+import addRecipeGenerator from '@spoonfeed/generators/add-recipe/generator';
+import removeRecipeGenerator from '@spoonfeed/generators/remove-recipe/generator';
 
 type ManifestJson = {
   projectType: string;
-  spoonfeederVersion: string;
+  spoonfeedVersion: string;
   recipes: Record<string, { files: string[]; moduleImport?: unknown; mainTsBlocks?: string[] }>;
   [key: string]: unknown;
 };
@@ -18,18 +18,18 @@ type PackageJson = {
 };
 
 /**
- * Creates a minimal project tree that looks like a spoonfeeder-generated project.
- * Includes package.json, .spoonfeeder.json, app.module.ts, main.ts, .env.example,
+ * Creates a minimal project tree that looks like a spoonfeed-generated project.
+ * Includes package.json, .spoonfeed.json, app.module.ts, main.ts, .env.example,
  * CLAUDE.md, .github/copilot-instructions.md.
  */
 function seedFullProject(tree: Tree): void {
   tree.write(
-    '.spoonfeeder.json',
+    '.spoonfeed.json',
     JSON.stringify(
       {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {},
       },
@@ -124,7 +124,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
     await addRecipeGenerator(tree, { recipe: 'swagger', skipInstall: true });
 
     // Verify it was added
-    const manifestAfterAdd = readJson<ManifestJson>(tree, '.spoonfeeder.json');
+    const manifestAfterAdd = readJson<ManifestJson>(tree, '.spoonfeed.json');
     expect(manifestAfterAdd.recipes['swagger']).toBeDefined();
 
     const pkgAfterAdd = readJson<PackageJson>(tree, 'package.json');
@@ -134,7 +134,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
     await removeRecipeGenerator(tree, { recipe: 'swagger' });
 
     // Verify manifest is clean
-    const manifestAfterRemove = readJson<ManifestJson>(tree, '.spoonfeeder.json');
+    const manifestAfterRemove = readJson<ManifestJson>(tree, '.spoonfeed.json');
     expect(manifestAfterRemove.recipes['swagger']).toBeUndefined();
     expect(Object.keys(manifestAfterRemove.recipes)).toHaveLength(0);
 
@@ -152,7 +152,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
 
     // CLAUDE.md should have swagger section removed
     const claudeAfter = tree.read('CLAUDE.md', 'utf-8')!;
-    expect(claudeAfter).not.toContain('@spoonfeeder:swagger');
+    expect(claudeAfter).not.toContain('@spoonfeed:swagger');
     expect(claudeAfter).toContain('## Package Manager');
     // Original CLAUDE.md content should be preserved (trimming/formatting may differ slightly)
     expect(claudeAfter).toContain(claudeBefore.trim().split('\n')[0]);
@@ -162,13 +162,13 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
     // Add pino
     await addRecipeGenerator(tree, { recipe: 'pino', skipInstall: true });
 
-    const manifestAfterAdd = readJson<ManifestJson>(tree, '.spoonfeeder.json');
+    const manifestAfterAdd = readJson<ManifestJson>(tree, '.spoonfeed.json');
     expect(manifestAfterAdd.recipes['pino']).toBeDefined();
 
     // Remove pino
     await removeRecipeGenerator(tree, { recipe: 'pino' });
 
-    const manifestAfterRemove = readJson<ManifestJson>(tree, '.spoonfeeder.json');
+    const manifestAfterRemove = readJson<ManifestJson>(tree, '.spoonfeed.json');
     expect(manifestAfterRemove.recipes['pino']).toBeUndefined();
 
     // Pino deps should be gone
@@ -185,7 +185,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
     // Remove only swagger
     await removeRecipeGenerator(tree, { recipe: 'swagger' });
 
-    const manifest = readJson<ManifestJson>(tree, '.spoonfeeder.json');
+    const manifest = readJson<ManifestJson>(tree, '.spoonfeed.json');
     expect(manifest.recipes['swagger']).toBeUndefined();
     expect(manifest.recipes['helmet']).toBeDefined();
 

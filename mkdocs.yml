@@ -1,9 +1,9 @@
-site_name: spoonfeeder
-site_url: https://bbjansen.github.io/spoonfeeder/
+site_name: spoonfeed
+site_url: https://bbjansen.github.io/spoonfeed/
 site_description: NestJS project scaffolder with 112 composable recipes
 site_author: B.B. Jansen
-repo_url: https://github.com/bbjansen/spoonfeeder
-repo_name: bbjansen/spoonfeeder
+repo_url: https://github.com/bbjansen/spoonfeed
+repo_name: bbjansen/spoonfeed
 edit_uri: edit/main/site-docs/
 docs_dir: site-docs
 
@@ -92,6 +92,6 @@ copyright: Copyright &copy; 2026 BBJ Systems Holding
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/bbjansen/spoonfeeder
+      link: https://github.com/bbjansen/spoonfeed
     - icon: fontawesome/brands/npm
-      link: https://www.npmjs.com/package/spoonfeeder
+      link: https://www.npmjs.com/package/spoonfeed

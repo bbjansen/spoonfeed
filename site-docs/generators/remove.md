@@ -5,20 +5,20 @@ Remove a recipe from an existing project. The generator removes dependencies, co
 ## Usage
 
 ```bash
-nx g spoonfeeder:remove --recipe=<recipe-id>
+nx g spoonfeed:remove --recipe=<recipe-id>
 ```
 
 ## Examples
 
 ```bash
 # Remove Swagger documentation
-nx g spoonfeeder:remove --recipe=swagger
+nx g spoonfeed:remove --recipe=swagger
 
 # Remove JWT authentication
-nx g spoonfeeder:remove --recipe=jwt-auth
+nx g spoonfeed:remove --recipe=jwt-auth
 
 # Remove TypeORM with PostgreSQL
-nx g spoonfeeder:remove --recipe=typeorm-postgres
+nx g spoonfeed:remove --recipe=typeorm-postgres
 ```
 
 ## What It Does
@@ -29,7 +29,7 @@ nx g spoonfeeder:remove --recipe=typeorm-postgres
 4. **Updates main.ts** — Removes the recipe's setup block and associated imports (if any)
 5. **Removes environment variables** — Cleans up recipe-specific variables from `.env.example`
 6. **Updates AI context** — Removes recipe documentation from `CLAUDE.md`, `.cursor/rules/<recipe-id>.mdc`, and `.github/copilot-instructions.md`
-7. **Updates manifest** — Removes the recipe entry from `.spoonfeeder.json`
+7. **Updates manifest** — Removes the recipe entry from `.spoonfeed.json`
 
 ### What Gets Cleaned Up
 
@@ -39,7 +39,7 @@ Every artifact the add generator created is reversed:
 - [ ] `src/app.module.ts` — module import and registration removed
 - [ ] `src/main.ts` — setup block and associated imports removed
 - [ ] `.env.example` — recipe-specific variable section removed
-- [ ] `.spoonfeeder.json` — recipe entry removed from the manifest
+- [ ] `.spoonfeed.json` — recipe entry removed from the manifest
 - [ ] `CLAUDE.md` — recipe documentation section removed
 - [ ] `.github/copilot-instructions.md` — recipe documentation section removed
 - [ ] `.cursor/rules/<recipe-id>.mdc` — cursor rules file deleted
@@ -54,7 +54,7 @@ Suppose your project currently has `jwt-auth`, `health-checks`, and `swagger` in
 ### 1. Run the generator
 
 ```bash
-nx g spoonfeeder:remove --recipe=swagger
+nx g spoonfeed:remove --recipe=swagger
 ```
 
 ### 2. What happens
@@ -68,9 +68,9 @@ nx g spoonfeeder:remove --recipe=swagger
 - `package.json` — `@nestjs/swagger` and `@fastify/static` removed from dependencies
 - `src/main.ts` — the `DocumentBuilder` / `SwaggerModule` setup block and its imports removed
 - `.env.example` — the `# --- Swagger / OpenAPI ---` section removed
-- `CLAUDE.md` — the `<!-- @spoonfeeder:swagger -->` section removed
-- `.github/copilot-instructions.md` — the `<!-- @spoonfeeder:swagger -->` section removed
-- `.spoonfeeder.json` — the `swagger` entry removed from `recipes`
+- `CLAUDE.md` — the `<!-- @spoonfeed:swagger -->` section removed
+- `.github/copilot-instructions.md` — the `<!-- @spoonfeed:swagger -->` section removed
+- `.spoonfeed.json` — the `swagger` entry removed from `recipes`
 
 **src/main.ts after removal:**
 
@@ -109,7 +109,7 @@ Remove dependent recipes first, then remove the base recipe.
     The generator checks the `requires` field of every installed recipe. If any installed recipe lists the one you are removing as a requirement, the operation is rejected. For example:
 
     ```
-    $ nx g spoonfeeder:remove --recipe=jwt-auth
+    $ nx g spoonfeed:remove --recipe=jwt-auth
 
     Error: Cannot remove 'jwt-auth': the following installed recipes depend
     on it: 'Auth Flows' (auth-flows). Use --force to remove anyway.

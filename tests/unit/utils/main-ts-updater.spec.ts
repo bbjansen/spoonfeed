@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { insertBlock, removeBlock } from '@spoonfeeder/utils/main-ts-updater';
+import { insertBlock, removeBlock } from '@spoonfeed/utils/main-ts-updater';
 
 describe('main-ts-updater', () => {
   let tmpDir: string;

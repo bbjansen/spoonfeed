@@ -1,6 +1,6 @@
 # Developer Experience Recipes
 
-Spoonfeeder provides 7 developer experience recipes covering local development, configuration validation, data tooling, SDK generation, and admin panels. These recipes reduce friction during development by automating environment setup, data generation, and client SDK creation.
+spoonfeed provides 7 developer experience recipes covering local development, configuration validation, data tooling, SDK generation, and admin panels. These recipes reduce friction during development by automating environment setup, data generation, and client SDK creation.
 
 !!! tip "Recommended for all projects"
     - `config-validation` — catches missing environment variables at startup

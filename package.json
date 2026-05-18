@@ -1,22 +1,22 @@
 {
-  "name": "spoonfeeder",
-  "version": "0.1.1",
+  "name": "spoonfeed",
+  "version": "0.1.0",
   "description": "NestJS project scaffolder with 112 composable recipes",
   "author": "B.B. Jansen <bobjansen@pm.me>",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "spoonfeeder": "./dist/index.js",
-    "create-spoonfeeder": "./dist/index.js"
+    "spoonfeed": "./dist/index.js",
+    "create-spoonfeed": "./dist/index.js"
   },
   "generators": "./generators.json",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bbjansen/spoonfeeder.git"
+    "url": "git+https://github.com/bbjansen/spoonfeed.git"
   },
-  "homepage": "https://github.com/bbjansen/spoonfeeder#readme",
+  "homepage": "https://github.com/bbjansen/spoonfeed#readme",
   "bugs": {
-    "url": "https://github.com/bbjansen/spoonfeeder/issues"
+    "url": "https://github.com/bbjansen/spoonfeed/issues"
   },
   "keywords": [
     "nestjs",

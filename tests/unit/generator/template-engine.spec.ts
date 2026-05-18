@@ -1,4 +1,4 @@
-import { renderTemplate } from '@spoonfeeder/generator/template-engine';
+import { renderTemplate } from '@spoonfeed/generator/template-engine';
 
 describe('renderTemplate', () => {
   it('should render EJS template with data', () => {

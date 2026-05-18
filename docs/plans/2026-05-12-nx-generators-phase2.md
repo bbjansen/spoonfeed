@@ -34,7 +34,7 @@ This is **Phase 2 of 4**:
 | `tests/unit/utils/module-updater.spec.ts`                    | Unit + snapshot tests for module-updater                  |
 | `tests/unit/utils/main-ts-updater.spec.ts`                   | Unit tests for main-ts-updater                            |
 | `tests/unit/utils/__snapshots__/module-updater.spec.ts.snap` | Auto-generated snapshot file                              |
-| `tests/integration/spoonfeeder/ast-transforms.integration.spec.ts`                | Integration test: add swagger, verify build               |
+| `tests/integration/spoonfeed/ast-transforms.integration.spec.ts`                | Integration test: add swagger, verify build               |
 
 ### Files to Modify
 
@@ -54,7 +54,7 @@ This is **Phase 2 of 4**:
 - [ ] **Step 1: Install ts-morph with exact version**
 
 ```bash
-pnpm --filter spoonfeeder add -E ts-morph
+pnpm --filter spoonfeed add -E ts-morph
 ```
 
 - [ ] **Step 2: Verify the dependency was added with an exact version (no ^ or ~)**
@@ -68,7 +68,7 @@ Expected: `"ts-morph": "X.Y.Z"` (no caret or tilde prefix).
 - [ ] **Step 3: Verify build still works**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.
@@ -77,7 +77,7 @@ Expected: compiles with no errors.
 
 ```bash
 git add package.json pnpm-lock.yaml
-git commit -m "chore(spoonfeeder): add ts-morph dependency for ast transforms"
+git commit -m "chore(spoonfeed): add ts-morph dependency for ast transforms"
 ```
 
 ---
@@ -97,7 +97,7 @@ Create `tests/unit/utils/module-updater.spec.ts`:
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { addModuleImport, removeModuleImport } from '@spoonfeeder/utils/module-updater';
+import { addModuleImport, removeModuleImport } from '@spoonfeed/utils/module-updater';
 
 describe('module-updater', () => {
   let tmpDir: string;
@@ -408,7 +408,7 @@ Verify the snapshots contain:
 
 ```bash
 git add src/utils/module-updater.ts tests/unit/utils/module-updater.spec.ts tests/unit/utils/__snapshots__/
-git commit -m "feat(spoonfeeder): add module-updater with ts-morph ast transforms"
+git commit -m "feat(spoonfeed): add module-updater with ts-morph ast transforms"
 ```
 
 ---
@@ -428,7 +428,7 @@ Create `tests/unit/utils/main-ts-updater.spec.ts`:
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { insertBlock, removeBlock } from '@spoonfeeder/utils/main-ts-updater';
+import { insertBlock, removeBlock } from '@spoonfeed/utils/main-ts-updater';
 
 describe('main-ts-updater', () => {
   let tmpDir: string;
@@ -827,7 +827,7 @@ Verify the snapshot shows:
 
 ```bash
 git add src/utils/main-ts-updater.ts tests/unit/utils/main-ts-updater.spec.ts tests/unit/utils/__snapshots__/
-git commit -m "feat(spoonfeeder): add main-ts-updater with delimited block insertion/removal"
+git commit -m "feat(spoonfeed): add main-ts-updater with delimited block insertion/removal"
 ```
 
 ---
@@ -887,7 +887,7 @@ Also update the manifest entry to include module import and main.ts block metada
 updateJson(tree, manifestPath, (json) => {
   json.recipes[recipeId] = {
     installedAt: new Date().toISOString(),
-    version: json.spoonfeederVersion ?? '0.0.1',
+    version: json.spoonfeedVersion ?? '0.0.1',
     files: copiedFiles,
     ...(moduleImportMeta && { moduleImport: moduleImportMeta }),
     ...(mainTsSetup && { mainTsBlocks: [mainTsSetup.blockId] }),
@@ -930,7 +930,7 @@ Add to `RecipeDefinition`:
 - [ ] **Step 4: Verify build**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.
@@ -947,7 +947,7 @@ Expected: all existing tests pass (the new optional fields don't break existing 
 
 ```bash
 git add src/generators/add-recipe/generator.ts src/types.ts
-git commit -m "feat(spoonfeeder): integrate ast transforms into add-recipe generator"
+git commit -m "feat(spoonfeed): integrate ast transforms into add-recipe generator"
 ```
 
 ---
@@ -956,20 +956,20 @@ git commit -m "feat(spoonfeeder): integrate ast transforms into add-recipe gener
 
 **Files:**
 
-- Create: `tests/integration/spoonfeeder/ast-transforms.integration.spec.ts`
+- Create: `tests/integration/spoonfeed/ast-transforms.integration.spec.ts`
 
 This test validates the full pipeline: creating a project with the existing generator, then running `addModuleImport` and `insertBlock` against the generated files, and verifying TypeScript compilation succeeds.
 
 - [ ] **Step 1: Write the integration test**
 
-Create `tests/integration/spoonfeeder/ast-transforms.integration.spec.ts`:
+Create `tests/integration/spoonfeed/ast-transforms.integration.spec.ts`:
 
 ```typescript
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { addModuleImport, removeModuleImport } from '@spoonfeeder/utils/module-updater';
-import { insertBlock, removeBlock } from '@spoonfeeder/utils/main-ts-updater';
+import { addModuleImport, removeModuleImport } from '@spoonfeed/utils/module-updater';
+import { insertBlock, removeBlock } from '@spoonfeed/utils/main-ts-updater';
 
 describe('AST Transforms Integration', () => {
   let tmpDir: string;
@@ -1189,8 +1189,8 @@ Expected: 4 tests pass.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add tests/integration/spoonfeeder/ast-transforms.integration.spec.ts
-git commit -m "test(spoonfeeder): add integration tests for ast transforms"
+git add tests/integration/spoonfeed/ast-transforms.integration.spec.ts
+git commit -m "test(spoonfeed): add integration tests for ast transforms"
 ```
 
 ---
@@ -1213,10 +1213,10 @@ pnpm test -- --selectProjects integration --passWithNoTests
 
 Expected: all tests pass (existing + 4 new).
 
-- [ ] **Step 3: Build spoonfeeder package**
+- [ ] **Step 3: Build spoonfeed package**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.

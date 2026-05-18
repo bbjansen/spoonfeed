@@ -40,10 +40,10 @@ Initial public release.
 - ESLint + Prettier preconfigured
 
 #### Nx Generators
-- `spoonfeeder:add` — add a recipe to an existing project
-- `spoonfeeder:remove` — cleanly remove a recipe (deps, config, source, tests, AI context)
-- `spoonfeeder:migrate` — migrate between compatible recipes (e.g., TypeORM to Prisma)
-- `spoonfeeder:list` — list available and installed recipes with conflict annotations
+- `spoonfeed:add` — add a recipe to an existing project
+- `spoonfeed:remove` — cleanly remove a recipe (deps, config, source, tests, AI context)
+- `spoonfeed:migrate` — migrate between compatible recipes (e.g., TypeORM to Prisma)
+- `spoonfeed:list` — list available and installed recipes with conflict annotations
 
 #### Standards Compliance
 - RFC 9457 (Problem Details for HTTP APIs)

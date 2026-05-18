@@ -10,13 +10,13 @@ Proposed
 
 ## Context
 
-The current `spoonfeeder` CLI generates projects with selected recipes at creation time. However, teams frequently need to add recipes after project creation (e.g., adding Swagger to an existing API, adding Redis caching mid-project). Currently this requires manual integration.
+The current `spoonfeed` CLI generates projects with selected recipes at creation time. However, teams frequently need to add recipes after project creation (e.g., adding Swagger to an existing API, adding Redis caching mid-project). Currently this requires manual integration.
 
 Nx Generators can modify existing TypeScript files safely using AST transforms, making it possible to:
 
-- Add a recipe to an existing project (`nx g spoonfeeder:add-recipe swagger`)
-- Remove a recipe (`nx g spoonfeeder:remove-recipe pino`)
-- Migrate between recipes (`nx g spoonfeeder:migrate-orm typeorm-postgres drizzle-postgres`)
+- Add a recipe to an existing project (`nx g spoonfeed:add-recipe swagger`)
+- Remove a recipe (`nx g spoonfeed:remove-recipe pino`)
+- Migrate between recipes (`nx g spoonfeed:migrate-orm typeorm-postgres drizzle-postgres`)
 
 ## Decision
 

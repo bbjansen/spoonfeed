@@ -146,13 +146,13 @@ export async function generate(
         await fs.move(rootTestsDir, apiTestsDir, { overwrite: true });
       }
 
-      // Move nest-cli.json into apps/api/ and update sourceRoot
+      // Update nest-cli.json to point entryFile at apps/api/src/main (keep at root)
       const rootNestCli = path.join(outputDir, 'nest-cli.json');
       if (await fs.pathExists(rootNestCli)) {
         const nestCliJson = (await fs.readJson(rootNestCli)) as Record<string, unknown>;
-        nestCliJson.sourceRoot = 'src';
-        await fs.writeJson(path.join(apiDir, 'nest-cli.json'), nestCliJson, { spaces: 2 });
-        await fs.remove(rootNestCli);
+        nestCliJson.sourceRoot = 'apps/api/src';
+        nestCliJson.entryFile = 'apps/api/src/main';
+        await fs.writeJson(rootNestCli, nestCliJson, { spaces: 2 });
       }
 
       // Update jest.config.ts paths for workspace layout (tests and src under apps/api/)
@@ -289,11 +289,11 @@ export async function generate(
     await assembleCursorRules(outputDir, selectedRecipes);
     await assembleCopilotInstructions(outputDir, selectedRecipes);
 
-    // 10. Create .spoonfeeder.json manifest
+    // 10. Create .spoonfeed.json manifest
     const manifest = {
       projectType: config.projectType,
       cloudProvider: config.cloudProvider,
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: new Date().toISOString(),
       recipes: Object.fromEntries(
         selectedRecipes.map((recipe) => {
@@ -312,7 +312,7 @@ export async function generate(
         }),
       ),
     };
-    await fs.writeJson(path.join(outputDir, '.spoonfeeder.json'), manifest, { spaces: 2 });
+    await fs.writeJson(path.join(outputDir, '.spoonfeed.json'), manifest, { spaces: 2 });
 
     s.stop('Project structure created.');
   } catch (error) {

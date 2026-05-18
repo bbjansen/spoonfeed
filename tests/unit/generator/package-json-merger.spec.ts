@@ -1,7 +1,7 @@
 import {
   mergePackageJson,
   type PackageJsonFragment,
-} from '@spoonfeeder/generator/package-json-merger';
+} from '@spoonfeed/generator/package-json-merger';
 
 describe('mergePackageJson', () => {
   it('should merge dependencies from multiple fragments', () => {

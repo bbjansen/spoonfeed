@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { addModuleImport, removeModuleImport } from '@spoonfeeder/utils/module-updater';
+import { addModuleImport, removeModuleImport } from '@spoonfeed/utils/module-updater';
 
 describe('module-updater', () => {
   let tmpDir: string;

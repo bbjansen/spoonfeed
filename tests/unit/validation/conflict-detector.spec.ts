@@ -1,5 +1,5 @@
-import { detectConflicts } from '@spoonfeeder/validation/conflict-detector';
-import type { RecipeDefinition } from '@spoonfeeder/types';
+import { detectConflicts } from '@spoonfeed/validation/conflict-detector';
+import type { RecipeDefinition } from '@spoonfeed/types';
 
 function makeRecipe(overrides: Partial<RecipeDefinition> & { id: string }): RecipeDefinition {
   return {

@@ -1,6 +1,6 @@
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { Tree, readJson } from '@nx/devkit';
-import migrateRecipeGenerator from '@spoonfeeder/generators/migrate-recipe/generator';
+import migrateRecipeGenerator from '@spoonfeed/generators/migrate-recipe/generator';
 
 function typedReadJson<T>(tree: Tree, path: string): T {
   return readJson(tree, path) as T;
@@ -75,12 +75,12 @@ describe('migrate-recipe E2E: typeorm-postgres -> drizzle-postgres', () => {
     );
 
     tree.write(
-      '.spoonfeeder.json',
+      '.spoonfeed.json',
       JSON.stringify(
         {
           projectType: 'http-api',
           cloudProvider: 'aws',
-          spoonfeederVersion: '0.0.1',
+          spoonfeedVersion: '0.0.1',
           generatedAt: '2026-05-12T10:00:00Z',
           recipes: {
             'typeorm-postgres': {
@@ -136,10 +136,10 @@ describe('migrate-recipe E2E: typeorm-postgres -> drizzle-postgres', () => {
         '',
         'Always use pnpm.',
         '',
-        '<!-- @spoonfeeder:typeorm-postgres -->',
+        '<!-- @spoonfeed:typeorm-postgres -->',
         '## TypeORM + PostgreSQL',
         'Entities live in `src/<module>/entities/`. Use migrations for schema changes.',
-        '<!-- @spoonfeeder:end:typeorm-postgres -->',
+        '<!-- @spoonfeed:end:typeorm-postgres -->',
         '',
       ].join('\n'),
     );
@@ -202,7 +202,7 @@ describe('migrate-recipe E2E: typeorm-postgres -> drizzle-postgres', () => {
     // 1. Manifest: old recipe removed, new recipe added
     const manifest = typedReadJson<{ recipes: Record<string, { version: string }> }>(
       tree,
-      '.spoonfeeder.json',
+      '.spoonfeed.json',
     );
     expect(manifest.recipes['typeorm-postgres']).toBeUndefined();
     expect(manifest.recipes['drizzle-postgres']).toBeDefined();
@@ -228,8 +228,8 @@ describe('migrate-recipe E2E: typeorm-postgres -> drizzle-postgres', () => {
 
     // 4. CLAUDE.md: old section removed, new section added
     const claudeContent = tree.read('CLAUDE.md', 'utf-8')!;
-    expect(claudeContent).not.toContain('@spoonfeeder:typeorm-postgres');
-    expect(claudeContent).toContain('@spoonfeeder:drizzle-postgres');
+    expect(claudeContent).not.toContain('@spoonfeed:typeorm-postgres');
+    expect(claudeContent).toContain('@spoonfeed:drizzle-postgres');
     expect(claudeContent).toContain('Drizzle ORM');
     expect(claudeContent).toContain('## Package Manager'); // existing content preserved
 
@@ -265,7 +265,7 @@ describe('migrate-recipe E2E: typeorm-postgres -> drizzle-postgres', () => {
 
     const manifest = typedReadJson<{ recipes: Record<string, unknown> }>(
       tree,
-      '.spoonfeeder.json',
+      '.spoonfeed.json',
     );
     expect(manifest.recipes['typeorm-postgres']).toBeUndefined();
     expect(manifest.recipes['drizzle-postgres']).toBeDefined();

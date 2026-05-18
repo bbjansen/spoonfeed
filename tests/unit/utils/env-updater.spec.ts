@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { addEnvSection, removeEnvSection } from '@spoonfeeder/utils/env-updater';
+import { addEnvSection, removeEnvSection } from '@spoonfeed/utils/env-updater';
 
 describe('env-updater', () => {
   let tmpDir: string;

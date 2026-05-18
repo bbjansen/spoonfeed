@@ -1,5 +1,5 @@
-import { mergeEnvVars, renderEnvFile } from '@spoonfeeder/generator/env-merger';
-import type { EnvVar } from '@spoonfeeder/types';
+import { mergeEnvVars, renderEnvFile } from '@spoonfeed/generator/env-merger';
+import type { EnvVar } from '@spoonfeed/types';
 
 describe('mergeEnvVars', () => {
   it('should merge env vars from multiple sources', () => {

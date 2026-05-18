@@ -26,7 +26,7 @@
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd spoonfeeder
+cd spoonfeed
 
 # Install dependencies
 pnpm install
@@ -35,7 +35,7 @@ pnpm install
 pnpm build
 
 # Run the scaffolder
-pnpm create-spoonfeeder
+pnpm create-spoonfeed
 ```
 
 ---
@@ -46,7 +46,7 @@ pnpm create-spoonfeeder
 | -------------------- | ------------------------------------- |
 | `pnpm build`         | Compile TypeScript to `dist/`         |
 | `pnpm dev`           | Compile in watch mode                 |
-| `pnpm create-spoonfeeder` | Run the scaffolder CLI           |
+| `pnpm create-spoonfeed` | Run the scaffolder CLI           |
 | `pnpm lint`          | Lint and auto-fix source files        |
 | `pnpm format`        | Format all source files with Prettier |
 | `pnpm test`          | Run unit tests                        |
@@ -57,11 +57,11 @@ pnpm create-spoonfeeder
 
 ### Path Aliases
 
-The `@spoonfeeder/` alias maps to `src/`. Use it for all internal imports to avoid brittle relative paths.
+The `@spoonfeed/` alias maps to `src/`. Use it for all internal imports to avoid brittle relative paths.
 
 ```ts
 // Prefer this
-import { runAllPrompts } from '@spoonfeeder/prompts/run-all';
+import { runAllPrompts } from '@spoonfeed/prompts/run-all';
 
 // Over this
 import { runAllPrompts } from '../../prompts/run-all';

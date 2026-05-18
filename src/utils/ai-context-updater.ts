@@ -5,10 +5,10 @@ function addSection(filePath: string, recipeId: string, content: string): void {
   if (!fs.existsSync(filePath)) return;
 
   let fileContent = fs.readFileSync(filePath, 'utf-8');
-  const marker = `<!-- @spoonfeeder:${recipeId} -->`;
+  const marker = `<!-- @spoonfeed:${recipeId} -->`;
   if (fileContent.includes(marker)) return;
 
-  const section = `\n${marker}\n${content}\n<!-- @spoonfeeder:end:${recipeId} -->\n`;
+  const section = `\n${marker}\n${content}\n<!-- @spoonfeed:end:${recipeId} -->\n`;
   fileContent = fileContent.trimEnd() + '\n' + section;
   fs.writeFileSync(filePath, fileContent, 'utf-8');
 }
@@ -17,8 +17,8 @@ function removeSection(filePath: string, recipeId: string): void {
   if (!fs.existsSync(filePath)) return;
 
   let fileContent = fs.readFileSync(filePath, 'utf-8');
-  const startMarker = `<!-- @spoonfeeder:${recipeId} -->`;
-  const endMarker = `<!-- @spoonfeeder:end:${recipeId} -->`;
+  const startMarker = `<!-- @spoonfeed:${recipeId} -->`;
+  const endMarker = `<!-- @spoonfeed:end:${recipeId} -->`;
 
   const startIdx = fileContent.indexOf(startMarker);
   const endIdx = fileContent.indexOf(endMarker);

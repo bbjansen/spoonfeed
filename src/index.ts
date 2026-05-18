@@ -13,7 +13,7 @@ import { registerAllRecipes } from './recipes/definitions.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function main(): Promise<void> {
-  p.intro('spoonfeeder — NestJS Project Generator');
+  p.intro('spoonfeed — NestJS Project Generator');
 
   const registry = new RecipeRegistry();
   registerAllRecipes(registry);

@@ -2,10 +2,10 @@ import { execSync, spawn } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { generate } from '@spoonfeeder/generator/generator';
-import { RecipeRegistry } from '@spoonfeeder/recipes/registry';
-import { registerAllRecipes } from '@spoonfeeder/recipes/definitions';
-import type { ProjectConfig } from '@spoonfeeder/types';
+import { generate } from '@spoonfeed/generator/generator';
+import { RecipeRegistry } from '@spoonfeed/recipes/registry';
+import { registerAllRecipes } from '@spoonfeed/recipes/definitions';
+import type { ProjectConfig } from '@spoonfeed/types';
 
 jest.setTimeout(120000);
 
@@ -43,7 +43,7 @@ describe('CLI generator E2E', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-e2e-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-e2e-'));
   });
 
   afterEach(() => {

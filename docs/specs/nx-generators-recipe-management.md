@@ -4,10 +4,10 @@
 
 This spec defines four Nx generators that manage recipes in existing projects:
 
-- `nx g spoonfeeder:add <recipe>` -- add a recipe to a project
-- `nx g spoonfeeder:remove <recipe>` -- remove a recipe from a project
-- `nx g spoonfeeder:list` -- show installed and available recipes
-- `nx g spoonfeeder:migrate --from <recipe> --to <recipe>` -- swap conflicting recipes
+- `nx g spoonfeed:add <recipe>` -- add a recipe to a project
+- `nx g spoonfeed:remove <recipe>` -- remove a recipe from a project
+- `nx g spoonfeed:list` -- show installed and available recipes
+- `nx g spoonfeed:migrate --from <recipe> --to <recipe>` -- swap conflicting recipes
 
 Each generator modifies source files (`app.module.ts`, `main.ts`), `package.json`, `.env.example`, and AI context files (`CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`). All changes are staged as a single Nx generator tree, so the user can preview them with `--dry-run` before applying.
 
@@ -17,11 +17,11 @@ Each generator modifies source files (`app.module.ts`, `main.ts`), `package.json
 
 ### 2.1 add-recipe
 
-**Command:** `nx g spoonfeeder:add swagger`
+**Command:** `nx g spoonfeed:add swagger`
 
 **Steps:**
 
-1. Read `.spoonfeeder.json` to load current project state (project type, cloud provider, installed recipes).
+1. Read `.spoonfeed.json` to load current project state (project type, cloud provider, installed recipes).
 2. Look up the `RecipeDefinition` from the recipe registry by ID.
 3. Validate:
    - Recipe is compatible with the project type (`compatibleWith` field).
@@ -33,7 +33,7 @@ Each generator modifies source files (`app.module.ts`, `main.ts`), `package.json
 7. If the recipe has a `main.ts` setup snippet (e.g., Swagger, Fastify adapter), insert it into `src/main.ts` at the marked insertion point.
 8. Append recipe env vars to `.env.example` under a section header.
 9. Append `claudeMdSection` to `CLAUDE.md`, `cursorRules` to `.cursorrules`, `copilotInstructions` to `.github/copilot-instructions.md`.
-10. Update `.spoonfeeder.json` to include the new recipe ID and timestamp.
+10. Update `.spoonfeed.json` to include the new recipe ID and timestamp.
 11. Run `pnpm install` as a post-generation callback.
 
 **Flags:**
@@ -47,11 +47,11 @@ Each generator modifies source files (`app.module.ts`, `main.ts`), `package.json
 
 ### 2.2 remove-recipe
 
-**Command:** `nx g spoonfeeder:remove pino`
+**Command:** `nx g spoonfeed:remove pino`
 
 **Steps:**
 
-1. Read `.spoonfeeder.json` and confirm the recipe is installed.
+1. Read `.spoonfeed.json` and confirm the recipe is installed.
 2. Check that no other installed recipe depends on this one via `requires`.
 3. Remove recipe-specific files listed in the manifest's `files` array for this recipe.
 4. Remove `dependencies` and `devDependencies` from `package.json`.
@@ -59,7 +59,7 @@ Each generator modifies source files (`app.module.ts`, `main.ts`), `package.json
 6. If the recipe modified `main.ts`, remove its marked block (delimited by `// --- <recipe-id> start ---` / `// --- <recipe-id> end ---`).
 7. Remove the recipe's env vars section from `.env.example`.
 8. Remove the recipe's section from `CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`.
-9. Update `.spoonfeeder.json` to remove the recipe ID.
+9. Update `.spoonfeed.json` to remove the recipe ID.
 10. Run `pnpm install` to clean up the lockfile.
 
 **Flags:**
@@ -73,7 +73,7 @@ Each generator modifies source files (`app.module.ts`, `main.ts`), `package.json
 
 ### 2.3 list-recipes
 
-**Command:** `nx g spoonfeeder:list`
+**Command:** `nx g spoonfeed:list`
 
 **Output format:**
 
@@ -92,7 +92,7 @@ Available (120+):
   redis-cache     Redis caching layer
   ...
 
-Use: nx g spoonfeeder:add <recipe>
+Use: nx g spoonfeed:add <recipe>
 ```
 
 **Flags:**
@@ -105,7 +105,7 @@ Use: nx g spoonfeeder:add <recipe>
 
 ### 2.4 migrate-recipe
 
-**Command:** `nx g spoonfeeder:migrate --from typeorm-postgres --to drizzle-postgres`
+**Command:** `nx g spoonfeed:migrate --from typeorm-postgres --to drizzle-postgres`
 
 **Steps:**
 
@@ -154,7 +154,7 @@ Use: nx g spoonfeeder:add <recipe>
     utils/
       ast-transforms.ts       # ts-morph helpers for modifying source files
       ast-transforms.spec.ts
-      recipe-manifest.ts      # Read/write .spoonfeeder.json
+      recipe-manifest.ts      # Read/write .spoonfeed.json
       recipe-manifest.spec.ts
       module-updater.ts       # Add/remove imports from app.module.ts
       module-updater.spec.ts
@@ -199,7 +199,7 @@ Use: nx g spoonfeeder:add <recipe>
 
 ---
 
-## 4. Recipe Manifest (.spoonfeeder.json)
+## 4. Recipe Manifest (.spoonfeed.json)
 
 Tracks installed recipes and file ownership per project root. Created during initial project generation; maintained by generators thereafter.
 
@@ -207,7 +207,7 @@ Tracks installed recipes and file ownership per project root. Created during ini
 {
   "projectType": "http-api",
   "cloudProvider": "aws",
-  "spoonfeederVersion": "0.0.1",
+  "spoonfeedVersion": "0.0.1",
   "generatedAt": "2026-05-11T10:00:00Z",
   "recipes": {
     "swagger": {
@@ -437,7 +437,7 @@ The generators reuse everything that already exists in ``:
 | `RecipeRegistry` (recipes/registry.ts)               | Looking up recipes by ID, filtering by project type/category |
 | `detectConflicts` (validation/conflict-detector.ts)  | Validating that `add-recipe` won't introduce conflicts       |
 | `RECIPE_IDS` (types.ts)                              | Type-safe recipe ID validation at compile time               |
-| `ProjectConfig` (types.ts)                           | Type definition for `.spoonfeeder.json` core fields          |
+| `ProjectConfig` (types.ts)                           | Type definition for `.spoonfeed.json` core fields          |
 | Template directories (`templates/recipes/`) | Source files copied into the target project                  |
 
 The generators do NOT duplicate recipe metadata. A single `RecipeDefinition` entry in `definitions.ts` drives both initial project generation and post-hoc recipe management.
@@ -448,7 +448,7 @@ The generators do NOT duplicate recipe metadata. A single `RecipeDefinition` ent
 
 ### Phase 1: Foundation (add-recipe + list-recipes, no AST)
 
-- Implement `.spoonfeeder.json` manifest read/write (`recipe-manifest.ts`).
+- Implement `.spoonfeed.json` manifest read/write (`recipe-manifest.ts`).
 - Implement `list-recipes` generator: reads manifest + registry, prints table.
 - Implement `add-recipe` generator with file copying and `package.json` modification only.
 - Add env var appending to `.env.example`.
@@ -490,7 +490,7 @@ The generators do NOT duplicate recipe metadata. A single `RecipeDefinition` ent
 ### Unit tests (co-located `.spec.ts` files)
 
 - **AST transforms:** Feed in a minimal `app.module.ts` source string, run `addModuleImport`/`removeModuleImport`, assert the output source matches the expected string. Test edge cases: empty imports array, no imports property, duplicate guard, `ConfigModule.forRoot()` call expressions in imports.
-- **Manifest operations:** Create/read/update `.spoonfeeder.json`, verify schema integrity.
+- **Manifest operations:** Create/read/update `.spoonfeed.json`, verify schema integrity.
 - **Env updater:** Add a section, remove a section, verify idempotency (adding twice doesn't duplicate).
 - **AI context updater:** Same add/remove/idempotency tests for `CLAUDE.md` sections.
 
@@ -517,7 +517,7 @@ The generators do NOT duplicate recipe metadata. A single `RecipeDefinition` ent
 
 1. **Standalone vs. monorepo:** Should generators work without Nx installed (e.g., via `npx`)? If so, the generators need a standalone runner that doesn't depend on `nx.json` or workspace configuration. Recommendation: support both by detecting whether `nx.json` exists and falling back to a lightweight runner.
 
-2. **main.ts modification strategy:** The delimited block approach (`// --- <id> start/end ---`) works for additive setup code (Swagger, compression, helmet). But some recipes require wrapping the entire bootstrap (e.g., Fastify adapter replaces `NestFactory.create` call). Recommendation: use a slot-based system in the generated `main.ts` template with named insertion points (`// @spoonfeeder:adapter`, `// @spoonfeeder:before-listen`, `// @spoonfeeder:after-create`).
+2. **main.ts modification strategy:** The delimited block approach (`// --- <id> start/end ---`) works for additive setup code (Swagger, compression, helmet). But some recipes require wrapping the entire bootstrap (e.g., Fastify adapter replaces `NestFactory.create` call). Recommendation: use a slot-based system in the generated `main.ts` template with named insertion points (`// @spoonfeed:adapter`, `// @spoonfeed:before-listen`, `// @spoonfeed:after-create`).
 
 3. **File ownership granularity:** The current manifest tracks files at the path level. If two recipes both contribute to the same file (e.g., both add a middleware), removal becomes ambiguous. Recommendation: for shared files, track at the block/section level using the same delimiter pattern as `main.ts`. For recipe-exclusive files, track at the file level.
 

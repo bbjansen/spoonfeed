@@ -1,6 +1,6 @@
 # Queue & Messaging Recipes
 
-Spoonfeeder provides 3 queue and messaging recipes covering message brokers, job queues, and dead letter handling. Use these recipes for asynchronous processing, event-driven architectures, and background job execution. Choose RabbitMQ for message routing and pub/sub, or BullMQ for Redis-backed job queues with scheduling and retries.
+spoonfeed provides 3 queue and messaging recipes covering message brokers, job queues, and dead letter handling. Use these recipes for asynchronous processing, event-driven architectures, and background job execution. Choose RabbitMQ for message routing and pub/sub, or BullMQ for Redis-backed job queues with scheduling and retries.
 
 !!! tip "Recommended combinations"
     - **Reliable async processing:** `rabbitmq` + `dead-letter-queue` + `transactional-outbox`

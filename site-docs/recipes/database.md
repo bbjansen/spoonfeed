@@ -1,6 +1,6 @@
 # Database Recipes
 
-Spoonfeeder provides 10 database-related recipes covering relational ORMs, document databases, and data lifecycle patterns. Choose a primary ORM/ODM recipe for your project, then layer on optional recipes like soft-delete, audit-trail, or transactional-outbox to handle cross-cutting data concerns.
+spoonfeed provides 10 database-related recipes covering relational ORMs, document databases, and data lifecycle patterns. Choose a primary ORM/ODM recipe for your project, then layer on optional recipes like soft-delete, audit-trail, or transactional-outbox to handle cross-cutting data concerns.
 
 !!! note "Mutual exclusivity"
     The primary ORM/ODM recipes (`typeorm-postgres`, `typeorm-mysql`, `prisma`, `mongoose`, `drizzle-postgres`, `kysely`, `mikro-orm`) conflict with each other. Select one per project.

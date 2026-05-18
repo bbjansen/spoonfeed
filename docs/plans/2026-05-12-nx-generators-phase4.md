@@ -104,7 +104,7 @@ export interface MigrateRecipeGeneratorSchema {
 
 ```bash
 git add src/generators/migrate-recipe/schema.json src/generators/migrate-recipe/schema.d.ts
-git commit -m "feat(spoonfeeder): add migrate-recipe generator schema and types"
+git commit -m "feat(spoonfeed): add migrate-recipe generator schema and types"
 ```
 
 ---
@@ -425,9 +425,9 @@ export default async function migrateRecipeGenerator(
   registerAllRecipes(registry);
 
   // Read manifest
-  const manifestPath = '.spoonfeeder.json';
+  const manifestPath = '.spoonfeed.json';
   if (!tree.exists(manifestPath)) {
-    throw new Error('.spoonfeeder.json not found. Is this a spoonfeeder-generated project?');
+    throw new Error('.spoonfeed.json not found. Is this a spoonfeed-generated project?');
   }
 
   const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as {
@@ -525,7 +525,7 @@ Read `generators.json` and add the `migrate` entry. The file should look like:
 - [ ] **Step 4: Verify build**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.
@@ -534,7 +534,7 @@ Expected: compiles with no errors.
 
 ```bash
 git add src/generators/migrate-recipe/ generators.json
-git commit -m "feat(spoonfeeder): implement migrate-recipe generator with migration guidance"
+git commit -m "feat(spoonfeed): implement migrate-recipe generator with migration guidance"
 ```
 
 ---
@@ -568,11 +568,11 @@ describe('migrate-recipe generator', () => {
 
     // Seed a minimal project with typeorm-postgres installed
     tree.write(
-      '.spoonfeeder.json',
+      '.spoonfeed.json',
       JSON.stringify({
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           'typeorm-postgres': {
@@ -609,7 +609,7 @@ describe('migrate-recipe generator', () => {
     );
     tree.write(
       'CLAUDE.md',
-      '# CLAUDE.md\n\n<!-- @spoonfeeder:typeorm-postgres -->\n## TypeORM + PostgreSQL\n<!-- @spoonfeeder:end:typeorm-postgres -->\n',
+      '# CLAUDE.md\n\n<!-- @spoonfeed:typeorm-postgres -->\n## TypeORM + PostgreSQL\n<!-- @spoonfeed:end:typeorm-postgres -->\n',
     );
     tree.write(
       'src/app.module.ts',
@@ -695,11 +695,11 @@ export class AppModule {}
   });
 
   describe('migrateRecipeGenerator', () => {
-    it('should throw when .spoonfeeder.json is missing', async () => {
-      tree.delete('.spoonfeeder.json');
+    it('should throw when .spoonfeed.json is missing', async () => {
+      tree.delete('.spoonfeed.json');
       await expect(
         migrateRecipeGenerator(tree, { from: 'typeorm-postgres', to: 'drizzle-postgres' }),
-      ).rejects.toThrow('.spoonfeeder.json not found');
+      ).rejects.toThrow('.spoonfeed.json not found');
     });
 
     it('should throw for cross-category migration', async () => {
@@ -714,7 +714,7 @@ export class AppModule {}
         to: 'drizzle-postgres',
       });
 
-      const manifest = readJson(tree, '.spoonfeeder.json');
+      const manifest = readJson(tree, '.spoonfeed.json');
       expect(manifest.recipes['typeorm-postgres']).toBeUndefined();
       expect(manifest.recipes['drizzle-postgres']).toBeDefined();
 
@@ -743,8 +743,8 @@ export class AppModule {}
       });
 
       const claudeContent = tree.read('CLAUDE.md', 'utf-8')!;
-      expect(claudeContent).not.toContain('@spoonfeeder:typeorm-postgres');
-      expect(claudeContent).toContain('@spoonfeeder:drizzle-postgres');
+      expect(claudeContent).not.toContain('@spoonfeed:typeorm-postgres');
+      expect(claudeContent).toContain('@spoonfeed:drizzle-postgres');
       expect(claudeContent).toContain('Drizzle ORM');
     });
   });
@@ -763,7 +763,7 @@ Expected: all tests pass.
 
 ```bash
 git add src/generators/migrate-recipe/generator.spec.ts
-git commit -m "test(spoonfeeder): add unit tests for migrate-recipe generator"
+git commit -m "test(spoonfeed): add unit tests for migrate-recipe generator"
 ```
 
 ---
@@ -853,12 +853,12 @@ describe('migrate-recipe E2E: typeorm-postgres → drizzle-postgres', () => {
     );
 
     tree.write(
-      '.spoonfeeder.json',
+      '.spoonfeed.json',
       JSON.stringify(
         {
           projectType: 'http-api',
           cloudProvider: 'aws',
-          spoonfeederVersion: '0.0.1',
+          spoonfeedVersion: '0.0.1',
           generatedAt: '2026-05-12T10:00:00Z',
           recipes: {
             'typeorm-postgres': {
@@ -914,10 +914,10 @@ describe('migrate-recipe E2E: typeorm-postgres → drizzle-postgres', () => {
         '',
         'Always use pnpm.',
         '',
-        '<!-- @spoonfeeder:typeorm-postgres -->',
+        '<!-- @spoonfeed:typeorm-postgres -->',
         '## TypeORM + PostgreSQL',
         'Entities live in `src/<module>/entities/`. Use migrations for schema changes.',
-        '<!-- @spoonfeeder:end:typeorm-postgres -->',
+        '<!-- @spoonfeed:end:typeorm-postgres -->',
         '',
       ].join('\n'),
     );
@@ -978,7 +978,7 @@ describe('migrate-recipe E2E: typeorm-postgres → drizzle-postgres', () => {
     });
 
     // 1. Manifest: old recipe removed, new recipe added
-    const manifest = readJson(tree, '.spoonfeeder.json');
+    const manifest = readJson(tree, '.spoonfeed.json');
     expect(manifest.recipes['typeorm-postgres']).toBeUndefined();
     expect(manifest.recipes['drizzle-postgres']).toBeDefined();
     expect(manifest.recipes['drizzle-postgres'].version).toBe('0.0.1');
@@ -1000,8 +1000,8 @@ describe('migrate-recipe E2E: typeorm-postgres → drizzle-postgres', () => {
 
     // 4. CLAUDE.md: old section removed, new section added
     const claudeContent = tree.read('CLAUDE.md', 'utf-8')!;
-    expect(claudeContent).not.toContain('@spoonfeeder:typeorm-postgres');
-    expect(claudeContent).toContain('@spoonfeeder:drizzle-postgres');
+    expect(claudeContent).not.toContain('@spoonfeed:typeorm-postgres');
+    expect(claudeContent).toContain('@spoonfeed:drizzle-postgres');
     expect(claudeContent).toContain('Drizzle ORM');
     expect(claudeContent).toContain('## Package Manager'); // existing content preserved
 
@@ -1030,7 +1030,7 @@ describe('migrate-recipe E2E: typeorm-postgres → drizzle-postgres', () => {
   it('should work with dry-run flag without modifying files', async () => {
     // Take a snapshot of all files before
     const filesBefore = new Map<string, string>();
-    const manifestBefore = tree.read('.spoonfeeder.json', 'utf-8')!;
+    const manifestBefore = tree.read('.spoonfeed.json', 'utf-8')!;
     const pkgBefore = tree.read('package.json', 'utf-8')!;
 
     // Note: dry-run in Nx devkit still applies changes to the virtual tree.
@@ -1062,7 +1062,7 @@ Expected: all tests pass.
 
 ```bash
 git add tests/e2e/migrate-recipe.e2e.spec.ts
-git commit -m "test(spoonfeeder): add e2e tests for migrate-recipe generator"
+git commit -m "test(spoonfeed): add e2e tests for migrate-recipe generator"
 ```
 
 ---
@@ -1085,10 +1085,10 @@ pnpm test:e2e --passWithNoTests
 
 Expected: all E2E tests pass including the new migrate-recipe test.
 
-- [ ] **Step 3: Build spoonfeeder**
+- [ ] **Step 3: Build spoonfeed**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.

@@ -1,6 +1,6 @@
 # RFC & Standards Compliance
 
-This document tracks which RFCs and open standards spoonfeeder implements, supports via recipes, or recommends.
+This document tracks which RFCs and open standards spoonfeed implements, supports via recipes, or recommends.
 
 ## Implemented in Base Template
 

@@ -2,10 +2,10 @@ import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { Tree, readJson } from '@nx/devkit';
 import migrateRecipeGenerator, {
   validateMigrationPair,
-} from '@spoonfeeder/generators/migrate-recipe/generator';
-import { RecipeRegistry } from '@spoonfeeder/recipes/registry';
-import { registerAllRecipes } from '@spoonfeeder/recipes/definitions';
-import { getMigrationGuidance } from '@spoonfeeder/generators/migrate-recipe/migration-guidance';
+} from '@spoonfeed/generators/migrate-recipe/generator';
+import { RecipeRegistry } from '@spoonfeed/recipes/registry';
+import { registerAllRecipes } from '@spoonfeed/recipes/definitions';
+import { getMigrationGuidance } from '@spoonfeed/generators/migrate-recipe/migration-guidance';
 
 function typedReadJson<T>(tree: Tree, path: string): T {
   return readJson(tree, path) as T;
@@ -22,11 +22,11 @@ describe('migrate-recipe generator', () => {
 
     // Seed a minimal project with typeorm-postgres installed
     tree.write(
-      '.spoonfeeder.json',
+      '.spoonfeed.json',
       JSON.stringify({
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           'typeorm-postgres': {
@@ -63,7 +63,7 @@ describe('migrate-recipe generator', () => {
     );
     tree.write(
       'CLAUDE.md',
-      '# CLAUDE.md\n\n<!-- @spoonfeeder:typeorm-postgres -->\n## TypeORM + PostgreSQL\n<!-- @spoonfeeder:end:typeorm-postgres -->\n',
+      '# CLAUDE.md\n\n<!-- @spoonfeed:typeorm-postgres -->\n## TypeORM + PostgreSQL\n<!-- @spoonfeed:end:typeorm-postgres -->\n',
     );
     tree.write(
       'src/app.module.ts',
@@ -149,11 +149,11 @@ export class AppModule {}
   });
 
   describe('migrateRecipeGenerator', () => {
-    it('should throw when .spoonfeeder.json is missing', async () => {
-      tree.delete('.spoonfeeder.json');
+    it('should throw when .spoonfeed.json is missing', async () => {
+      tree.delete('.spoonfeed.json');
       await expect(
         migrateRecipeGenerator(tree, { from: 'typeorm-postgres', to: 'drizzle-postgres' }),
-      ).rejects.toThrow('.spoonfeeder.json not found');
+      ).rejects.toThrow('.spoonfeed.json not found');
     });
 
     it('should throw for cross-category migration', async () => {
@@ -170,7 +170,7 @@ export class AppModule {}
 
       const manifest = typedReadJson<{ recipes: Record<string, unknown> }>(
         tree,
-        '.spoonfeeder.json',
+        '.spoonfeed.json',
       );
       expect(manifest.recipes['typeorm-postgres']).toBeUndefined();
       expect(manifest.recipes['drizzle-postgres']).toBeDefined();
@@ -203,8 +203,8 @@ export class AppModule {}
       });
 
       const claudeContent = tree.read('CLAUDE.md', 'utf-8')!;
-      expect(claudeContent).not.toContain('@spoonfeeder:typeorm-postgres');
-      expect(claudeContent).toContain('@spoonfeeder:drizzle-postgres');
+      expect(claudeContent).not.toContain('@spoonfeed:typeorm-postgres');
+      expect(claudeContent).toContain('@spoonfeed:drizzle-postgres');
       expect(claudeContent).toContain('Drizzle ORM');
     });
   });

@@ -1,5 +1,5 @@
-import { validateConfig } from '@spoonfeeder/validation/config-validator';
-import type { ProjectConfig } from '@spoonfeeder/types';
+import { validateConfig } from '@spoonfeed/validation/config-validator';
+import type { ProjectConfig } from '@spoonfeed/types';
 
 const validConfig: ProjectConfig = {
   name: 'my-api',

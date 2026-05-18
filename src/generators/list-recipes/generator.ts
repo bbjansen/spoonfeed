@@ -2,7 +2,7 @@ import { Tree, logger } from '@nx/devkit';
 import { RecipeRegistry } from '../../recipes/registry.js';
 import { registerAllRecipes } from '../../recipes/definitions.js';
 import type { RecipeId } from '../../types.js';
-import type { SpoonfeederManifest } from '../../utils/recipe-manifest.js';
+import type { SpoonfeedManifest } from '../../utils/recipe-manifest.js';
 import type { ListRecipesGeneratorSchema } from './schema.js';
 
 export default function listRecipesGenerator(
@@ -13,9 +13,9 @@ export default function listRecipesGenerator(
   registerAllRecipes(registry);
 
   // Read manifest
-  const manifestPath = '.spoonfeeder.json';
+  const manifestPath = '.spoonfeed.json';
   const manifest = tree.exists(manifestPath)
-    ? (JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeederManifest)
+    ? (JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeedManifest)
     : null;
 
   const installedIds = manifest ? Object.keys(manifest.recipes) : [];
@@ -68,5 +68,5 @@ export default function listRecipesGenerator(
     logger.info(`  ... and ${available.length - 20} more`);
   }
 
-  logger.info('\nUse: nx g spoonfeeder:add <recipe>');
+  logger.info('\nUse: nx g spoonfeed:add <recipe>');
 }

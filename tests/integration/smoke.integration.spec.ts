@@ -2,10 +2,10 @@ import { execSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { generate } from '@spoonfeeder/generator/generator';
-import { RecipeRegistry } from '@spoonfeeder/recipes/registry';
-import { registerAllRecipes } from '@spoonfeeder/recipes/definitions';
-import type { ProjectConfig } from '@spoonfeeder/types';
+import { generate } from '@spoonfeed/generator/generator';
+import { RecipeRegistry } from '@spoonfeed/recipes/registry';
+import { registerAllRecipes } from '@spoonfeed/recipes/definitions';
+import type { ProjectConfig } from '@spoonfeed/types';
 
 // Suppress @clack/prompts spinner output in tests
 jest.mock('@clack/prompts', () => ({
@@ -56,7 +56,7 @@ describe('Smoke tests: generated projects install and build', () => {
   let registry: RecipeRegistry;
 
   beforeEach(() => {
-    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-smoke-'));
+    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-smoke-'));
     registry = createRegistry();
   });
 

@@ -1,6 +1,6 @@
 # Observability Recipes
 
-Spoonfeeder provides 3 observability recipes covering distributed tracing, request logging, and trace context propagation. These recipes help you understand what your application is doing in production — from individual request logs to end-to-end distributed traces across services.
+spoonfeed provides 3 observability recipes covering distributed tracing, request logging, and trace context propagation. These recipes help you understand what your application is doing in production — from individual request logs to end-to-end distributed traces across services.
 
 !!! tip "Recommended combinations"
     - **Full observability stack:** `opentelemetry` + `request-logging` + `distributed-tracing` + `correlation-id`

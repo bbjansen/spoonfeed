@@ -19,13 +19,13 @@ We needed a tool to scaffold new NestJS projects with standardized patterns, rec
 
 ## Decision
 
-Use the **generate-and-own** approach via `spoonfeeder`, a CLI scaffolder built with `@clack/prompts`.
+Use the **generate-and-own** approach via `spoonfeed`, a CLI scaffolder built with `@clack/prompts`.
 
 ## Consequences
 
 ### Positive
 
-- **Zero lock-in** — Generated projects have no dependency on spoonfeeder
+- **Zero lock-in** — Generated projects have no dependency on spoonfeed
 - **Full ownership** — Teams can modify any generated file (tsconfig, eslint, package.json) directly
 - **No learning curve** — Developers edit files normally, no Projen API to learn
 - **Composable recipes** — 100+ recipes can be mixed and matched at generation time

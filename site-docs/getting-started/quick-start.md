@@ -1,6 +1,6 @@
 # Quick Start
 
-This guide walks you through scaffolding your first NestJS project with spoonfeeder.
+This guide walks you through scaffolding your first NestJS project with spoonfeed.
 
 ## Prerequisites
 
@@ -9,18 +9,18 @@ This guide walks you through scaffolding your first NestJS project with spoonfee
 
 ## Installation
 
-No global install required. Run spoonfeeder directly:
+No global install required. Run spoonfeed directly:
 
 === "pnpm"
 
     ```bash
-    pnpm dlx spoonfeeder
+    pnpm dlx spoonfeed
     ```
 
 === "npx"
 
     ```bash
-    npx spoonfeeder
+    npx spoonfeed
     ```
 
 ## CLI Walkthrough
@@ -82,7 +82,7 @@ Recipes declare conflicts and requirements explicitly. The CLI validates your se
 
 ## What Gets Generated
 
-After confirming your selections, spoonfeeder generates a complete project:
+After confirming your selections, spoonfeed generates a complete project:
 
 ```
 my-api/
@@ -194,4 +194,4 @@ curl http://localhost:3000/health
     | `pnpm lint` | Lint and auto-fix |
 
 !!! note "No runtime dependency"
-    The generated project has no dependency on spoonfeeder. It is a standard NestJS application that you own entirely.
+    The generated project has no dependency on spoonfeed. It is a standard NestJS application that you own entirely.

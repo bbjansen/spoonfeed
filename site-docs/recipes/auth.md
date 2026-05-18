@@ -1,6 +1,6 @@
 # Authentication Recipes
 
-Spoonfeeder provides 11 authentication and authorization recipes covering JWT, Passport strategies, OAuth providers, RBAC, MFA, and token proof-of-possession. Start with `jwt-auth` for most REST APIs, add `rbac-casl` for fine-grained permissions, and layer on OAuth providers or MFA as needed.
+spoonfeed provides 11 authentication and authorization recipes covering JWT, Passport strategies, OAuth providers, RBAC, MFA, and token proof-of-possession. Start with `jwt-auth` for most REST APIs, add `rbac-casl` for fine-grained permissions, and layer on OAuth providers or MFA as needed.
 
 !!! tip "Recommended combinations"
     - **Standard API auth:** `jwt-auth` + `rbac-casl` + `auth-flows`

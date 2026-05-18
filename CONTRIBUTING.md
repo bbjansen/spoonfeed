@@ -45,4 +45,4 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`
 
 ## Reporting Issues
 
-Open an issue at <https://github.com/bbjansen/spoonfeeder/issues> with a clear description and steps to reproduce.
+Open an issue at <https://github.com/bbjansen/spoonfeed/issues> with a clear description and steps to reproduce.

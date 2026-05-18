@@ -1,33 +1,33 @@
-# spoonfeeder
+# spoonfeed
 
 Interactive CLI that scaffolds production-ready NestJS projects with **112 composable recipes**. Pick a project type, choose your stack, and get a working codebase with structured error handling, test scaffolds, and deployment configs — ready to ship.
 
 ## Quick Start
 
 ```bash
-npx spoonfeeder
+npx spoonfeed
 ```
 
 Or with pnpm:
 
 ```bash
-pnpm dlx spoonfeeder
+pnpm dlx spoonfeed
 ```
 
 One command. The CLI walks you through project name, type, cloud provider, and recipe selection, then generates everything to disk.
 
-## Why spoonfeeder?
+## Why spoonfeed?
 
 - **Skip hours of boilerplate setup.** A production-ready NestJS project with structured errors, test scaffolds, CI pipelines, Docker configs, and environment files — generated in seconds instead of assembled by hand over days.
 - **Every recipe is tested against the generated project.** Recipes are not loose code snippets. Each one is validated to produce a project that compiles, lints, and passes its own test suite.
 - **Conflict detection prevents broken configs.** Recipes declare explicit conflicts and requirements. The CLI rejects incompatible combinations before generating a single file, so you never end up with a project that fails on first boot.
-- **No lock-in.** The generated project has zero runtime dependency on spoonfeeder. It is a standard NestJS application that you own entirely. Eject on day one if you want.
+- **No lock-in.** The generated project has zero runtime dependency on spoonfeed. It is a standard NestJS application that you own entirely. Eject on day one if you want.
 
 ## How does this differ from `nest new`?
 
 `nest new` gives you a minimal starter: a single module, a single controller, and a `package.json`. Everything else — database setup, authentication, validation, Docker, CI/CD, environment configs, error handling, test structure — is left to you.
 
-spoonfeeder gives you a **production-ready project** from the start. You select which capabilities you need, and the CLI wires them together with correct imports, configuration, typed errors, test scaffolds, and deployment files. The result is what your project would look like after a week of manual setup, generated in one command.
+spoonfeed gives you a **production-ready project** from the start. You select which capabilities you need, and the CLI wires them together with correct imports, configuration, typed errors, test scaffolds, and deployment files. The result is what your project would look like after a week of manual setup, generated in one command.
 
 ## What Gets Generated
 
@@ -93,7 +93,7 @@ my-api/
 ## What It Looks Like
 
 ```text
-┌  spoonfeeder — NestJS Project Generator
+┌  spoonfeed — NestJS Project Generator
 │
 ◇  Project name
 │  my-api

@@ -4,7 +4,7 @@
 
 **Goal:** Implement the remove-recipe generator that cleanly removes a recipe from a project — deleting recipe files, removing imports from app.module.ts, removing main.ts blocks, cleaning up env vars and AI context, and updating the manifest.
 
-**Architecture:** The `remove-recipe` generator lives at `src/generators/remove-recipe/` and performs the inverse of `add-recipe`. It reads the `.spoonfeeder.json` manifest to discover exactly what the recipe installed (files, module imports, main.ts blocks, env sections, AI context sections), then removes each artifact using the shared utilities from Phases 1-2. A dependency checker prevents removing a recipe that other installed recipes depend on (unless `--force` is used).
+**Architecture:** The `remove-recipe` generator lives at `src/generators/remove-recipe/` and performs the inverse of `add-recipe`. It reads the `.spoonfeed.json` manifest to discover exactly what the recipe installed (files, module imports, main.ts blocks, env sections, AI context sections), then removes each artifact using the shared utilities from Phases 1-2. A dependency checker prevents removing a recipe that other installed recipes depend on (unless `--force` is used).
 
 **Tech Stack:** @nx/devkit, ts-morph (reusing Phase 2 utilities)
 
@@ -37,8 +37,8 @@ This is **Phase 3 of 4**:
 | `src/utils/dependency-checker.ts`                       | Check if other recipes depend on a recipe      |
 | `tests/unit/utils/dependency-checker.spec.ts`           | Dependency checker unit tests                  |
 | `tests/unit/generators/remove-recipe/generator.spec.ts` | Remove-recipe generator unit tests             |
-| `tests/integration/spoonfeeder/remove-recipe.integration.spec.ts`            | Add-then-remove round-trip integration test    |
-| `tests/e2e/spoonfeeder/remove-recipe.e2e.spec.ts`                            | E2E: add swagger, build, remove swagger, build |
+| `tests/integration/spoonfeed/remove-recipe.integration.spec.ts`            | Add-then-remove round-trip integration test    |
+| `tests/e2e/spoonfeed/remove-recipe.e2e.spec.ts`                            | E2E: add swagger, build, remove swagger, build |
 
 ### Files to Modify
 
@@ -136,7 +136,7 @@ Read `generators.json` and add the `remove` entry to the `generators` object:
 
 ```bash
 git add src/generators/remove-recipe/schema.json src/generators/remove-recipe/schema.d.ts generators.json
-git commit -m "feat(spoonfeeder): add remove-recipe generator schema and types"
+git commit -m "feat(spoonfeed): add remove-recipe generator schema and types"
 ```
 
 ---
@@ -155,8 +155,8 @@ The dependency checker prevents removing a recipe that other installed recipes d
 Create `tests/unit/utils/dependency-checker.spec.ts`:
 
 ```typescript
-import { findDependents } from '@spoonfeeder/utils/dependency-checker';
-import type { RecipeDefinition, RecipeId } from '@spoonfeeder/types';
+import { findDependents } from '@spoonfeed/utils/dependency-checker';
+import type { RecipeDefinition, RecipeId } from '@spoonfeed/types';
 
 function makeRecipe(overrides: Partial<RecipeDefinition> & { id: RecipeId }): RecipeDefinition {
   return {
@@ -294,7 +294,7 @@ Expected: 5 tests pass.
 
 ```bash
 git add src/utils/dependency-checker.ts tests/unit/utils/dependency-checker.spec.ts
-git commit -m "feat(spoonfeeder): add dependency checker for recipe removal safety"
+git commit -m "feat(spoonfeed): add dependency checker for recipe removal safety"
 ```
 
 ---
@@ -346,10 +346,10 @@ interface RecipeManifestEntry {
   };
 }
 
-interface SpoonfeederManifest {
+interface SpoonfeedManifest {
   projectType: string;
   cloudProvider: string;
-  spoonfeederVersion: string;
+  spoonfeedVersion: string;
   generatedAt: string;
   recipes: Record<string, RecipeManifestEntry>;
 }
@@ -361,17 +361,17 @@ export default async function removeRecipeGenerator(
   const recipeId = options.recipe as RecipeId;
 
   // 1. Read manifest and confirm recipe is installed
-  const manifestPath = '.spoonfeeder.json';
+  const manifestPath = '.spoonfeed.json';
   if (!tree.exists(manifestPath)) {
-    throw new Error('.spoonfeeder.json not found. Is this a spoonfeeder-generated project?');
+    throw new Error('.spoonfeed.json not found. Is this a spoonfeed-generated project?');
   }
 
-  const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeederManifest;
+  const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeedManifest;
   const recipeEntry = manifest.recipes[recipeId];
 
   if (!recipeEntry) {
     throw new Error(
-      `Recipe '${recipeId}' is not installed. Run 'nx g spoonfeeder:list' to see installed recipes.`,
+      `Recipe '${recipeId}' is not installed. Run 'nx g spoonfeed:list' to see installed recipes.`,
     );
   }
 
@@ -464,9 +464,9 @@ export default async function removeRecipeGenerator(
       }
 
       // Remove any imports that were added for the main.ts blocks.
-      // These are tracked via comment markers: // @spoonfeeder-import:<recipe-id>
+      // These are tracked via comment markers: // @spoonfeed-import:<recipe-id>
       let mainContent = tree.read(mainTsPath, 'utf-8')!;
-      const importMarker = `// @spoonfeeder-import:${recipeId}`;
+      const importMarker = `// @spoonfeed-import:${recipeId}`;
       if (mainContent.includes(importMarker)) {
         const lines = mainContent.split('\n');
         const filtered: string[] = [];
@@ -520,7 +520,7 @@ export default async function removeRecipeGenerator(
   }
 
   // 9. Update manifest to remove the recipe
-  updateJson(tree, manifestPath, (json: SpoonfeederManifest) => {
+  updateJson(tree, manifestPath, (json: SpoonfeedManifest) => {
     delete json.recipes[recipeId];
     return json;
   });
@@ -531,14 +531,14 @@ export default async function removeRecipeGenerator(
 
 /**
  * Removes a delimited AI context section from a markdown file.
- * Sections are wrapped in <!-- @spoonfeeder:<id> --> / <!-- @spoonfeeder:end:<id> --> markers.
+ * Sections are wrapped in <!-- @spoonfeed:<id> --> / <!-- @spoonfeed:end:<id> --> markers.
  */
 function removeAiContextSection(tree: Tree, filePath: string, recipeId: string): void {
   if (!tree.exists(filePath)) return;
 
   let content = tree.read(filePath, 'utf-8')!;
-  const startMarker = `<!-- @spoonfeeder:${recipeId} -->`;
-  const endMarker = `<!-- @spoonfeeder:end:${recipeId} -->`;
+  const startMarker = `<!-- @spoonfeed:${recipeId} -->`;
+  const endMarker = `<!-- @spoonfeed:end:${recipeId} -->`;
 
   const startIdx = content.indexOf(startMarker);
   const endIdx = content.indexOf(endMarker);
@@ -582,7 +582,7 @@ function cleanEmptyDirectories(tree: Tree, deletedFiles: string[]): void {
 - [ ] **Step 2: Verify build**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.
@@ -591,7 +591,7 @@ Expected: compiles with no errors.
 
 ```bash
 git add src/generators/remove-recipe/generator.ts
-git commit -m "feat(spoonfeeder): implement remove-recipe generator"
+git commit -m "feat(spoonfeed): implement remove-recipe generator"
 ```
 
 ---
@@ -611,7 +611,7 @@ Create `tests/unit/generators/remove-recipe/generator.spec.ts`:
 ```typescript
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { Tree, readJson, updateJson } from '@nx/devkit';
-import removeRecipeGenerator from '@spoonfeeder/generators/remove-recipe/generator';
+import removeRecipeGenerator from '@spoonfeed/generators/remove-recipe/generator';
 
 /**
  * Creates a minimal project tree with a manifest that has the given recipe installed.
@@ -622,12 +622,12 @@ function seedProject(
   recipeEntry: Record<string, unknown> = {},
 ): void {
   tree.write(
-    '.spoonfeeder.json',
+    '.spoonfeed.json',
     JSON.stringify(
       {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           [recipeId]: {
@@ -663,7 +663,7 @@ describe('remove-recipe generator', () => {
 
   it('should throw if manifest does not exist', async () => {
     await expect(removeRecipeGenerator(tree, { recipe: 'swagger' })).rejects.toThrow(
-      '.spoonfeeder.json not found',
+      '.spoonfeed.json not found',
     );
   });
 
@@ -690,7 +690,7 @@ describe('remove-recipe generator', () => {
 
     await removeRecipeGenerator(tree, { recipe: 'swagger' });
 
-    const manifest = readJson(tree, '.spoonfeeder.json');
+    const manifest = readJson(tree, '.spoonfeed.json');
     expect(manifest.recipes['swagger']).toBeUndefined();
   });
 
@@ -792,10 +792,10 @@ SWAGGER_PATH=api/docs
 
 Always use pnpm.
 
-<!-- @spoonfeeder:swagger -->
+<!-- @spoonfeed:swagger -->
 ## Swagger / OpenAPI
 Swagger UI is available at /{SWAGGER_PATH}.
-<!-- @spoonfeeder:end:swagger -->
+<!-- @spoonfeed:end:swagger -->
 `,
     );
 
@@ -823,7 +823,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
     const manifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {
         swagger: {
@@ -845,7 +845,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
       },
     };
 
-    tree.write('.spoonfeeder.json', JSON.stringify(manifest, null, 2));
+    tree.write('.spoonfeed.json', JSON.stringify(manifest, null, 2));
     tree.write(
       'package.json',
       JSON.stringify(
@@ -872,7 +872,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
       const manifest = {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           'jwt-auth': {
@@ -890,7 +890,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
         },
       };
 
-      tree.write('.spoonfeeder.json', JSON.stringify(manifest, null, 2));
+      tree.write('.spoonfeed.json', JSON.stringify(manifest, null, 2));
       tree.write(
         'package.json',
         JSON.stringify({ name: 'test', dependencies: {}, devDependencies: {} }, null, 2),
@@ -905,7 +905,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
       const manifest = {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           'jwt-auth': {
@@ -923,7 +923,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
         },
       };
 
-      tree.write('.spoonfeeder.json', JSON.stringify(manifest, null, 2));
+      tree.write('.spoonfeed.json', JSON.stringify(manifest, null, 2));
       tree.write(
         'package.json',
         JSON.stringify({ name: 'test', dependencies: {}, devDependencies: {} }, null, 2),
@@ -931,7 +931,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
 
       await removeRecipeGenerator(tree, { recipe: 'jwt-auth', force: true });
 
-      const updated = readJson(tree, '.spoonfeeder.json');
+      const updated = readJson(tree, '.spoonfeed.json');
       expect(updated.recipes['jwt-auth']).toBeUndefined();
       expect(updated.recipes['rbac-casl']).toBeDefined();
     });
@@ -951,7 +951,7 @@ Expected: 12 tests pass.
 
 ```bash
 git add tests/unit/generators/remove-recipe/generator.spec.ts
-git commit -m "test(spoonfeeder): add remove-recipe generator unit tests"
+git commit -m "test(spoonfeed): add remove-recipe generator unit tests"
 ```
 
 ---
@@ -960,33 +960,33 @@ git commit -m "test(spoonfeeder): add remove-recipe generator unit tests"
 
 **Files:**
 
-- Create: `tests/integration/spoonfeeder/remove-recipe.integration.spec.ts`
+- Create: `tests/integration/spoonfeed/remove-recipe.integration.spec.ts`
 
 This test exercises the full round-trip: add a recipe, verify it was applied, then remove it and verify the project returns to its original state (clean diff).
 
 - [ ] **Step 1: Write the integration test**
 
-Create `tests/integration/spoonfeeder/remove-recipe.integration.spec.ts`:
+Create `tests/integration/spoonfeed/remove-recipe.integration.spec.ts`:
 
 ```typescript
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { Tree, readJson } from '@nx/devkit';
-import addRecipeGenerator from '@spoonfeeder/generators/add-recipe/generator';
-import removeRecipeGenerator from '@spoonfeeder/generators/remove-recipe/generator';
+import addRecipeGenerator from '@spoonfeed/generators/add-recipe/generator';
+import removeRecipeGenerator from '@spoonfeed/generators/remove-recipe/generator';
 
 /**
- * Creates a minimal project tree that looks like a spoonfeeder-generated project.
- * Includes package.json, .spoonfeeder.json, app.module.ts, main.ts, .env.example,
+ * Creates a minimal project tree that looks like a spoonfeed-generated project.
+ * Includes package.json, .spoonfeed.json, app.module.ts, main.ts, .env.example,
  * CLAUDE.md, .github/copilot-instructions.md.
  */
 function seedFullProject(tree: Tree): void {
   tree.write(
-    '.spoonfeeder.json',
+    '.spoonfeed.json',
     JSON.stringify(
       {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {},
       },
@@ -1103,7 +1103,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
     await addRecipeGenerator(tree, { recipe: 'swagger', skipInstall: true });
 
     // Verify it was added
-    const manifestAfterAdd = readJson(tree, '.spoonfeeder.json');
+    const manifestAfterAdd = readJson(tree, '.spoonfeed.json');
     expect(manifestAfterAdd.recipes['swagger']).toBeDefined();
 
     const pkgAfterAdd = readJson(tree, 'package.json');
@@ -1113,7 +1113,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
     await removeRecipeGenerator(tree, { recipe: 'swagger' });
 
     // Verify manifest is clean
-    const manifestAfterRemove = readJson(tree, '.spoonfeeder.json');
+    const manifestAfterRemove = readJson(tree, '.spoonfeed.json');
     expect(manifestAfterRemove.recipes['swagger']).toBeUndefined();
     expect(Object.keys(manifestAfterRemove.recipes)).toHaveLength(0);
 
@@ -1142,7 +1142,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
 
     await addRecipeGenerator(tree, { recipe: 'pino', skipInstall: true });
 
-    const manifestAfterAdd = readJson(tree, '.spoonfeeder.json');
+    const manifestAfterAdd = readJson(tree, '.spoonfeed.json');
     expect(manifestAfterAdd.recipes['pino']).toBeDefined();
 
     await removeRecipeGenerator(tree, { recipe: 'pino' });
@@ -1161,7 +1161,7 @@ describe('remove-recipe integration (add then remove round-trip)', () => {
     // Remove only swagger
     await removeRecipeGenerator(tree, { recipe: 'swagger' });
 
-    const manifest = readJson(tree, '.spoonfeeder.json');
+    const manifest = readJson(tree, '.spoonfeed.json');
     expect(manifest.recipes['swagger']).toBeUndefined();
     expect(manifest.recipes['helmet']).toBeDefined();
 
@@ -1183,8 +1183,8 @@ Expected: all 3 tests pass.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add tests/integration/spoonfeeder/remove-recipe.integration.spec.ts
-git commit -m "test(spoonfeeder): add remove-recipe round-trip integration tests"
+git add tests/integration/spoonfeed/remove-recipe.integration.spec.ts
+git commit -m "test(spoonfeed): add remove-recipe round-trip integration tests"
 ```
 
 ---
@@ -1193,13 +1193,13 @@ git commit -m "test(spoonfeeder): add remove-recipe round-trip integration tests
 
 **Files:**
 
-- Create: `tests/e2e/spoonfeeder/remove-recipe.e2e.spec.ts`
+- Create: `tests/e2e/spoonfeed/remove-recipe.e2e.spec.ts`
 
 This test generates a real project on disk, adds swagger, verifies it compiles, removes swagger, and verifies it still compiles. It exercises the full filesystem path (not the virtual Tree).
 
 - [ ] **Step 1: Write the E2E test**
 
-Create `tests/e2e/spoonfeeder/remove-recipe.e2e.spec.ts`:
+Create `tests/e2e/spoonfeed/remove-recipe.e2e.spec.ts`:
 
 ```typescript
 import * as fs from 'node:fs';
@@ -1230,7 +1230,7 @@ describe('remove-recipe E2E', () => {
   let projectDir: string;
 
   beforeAll(() => {
-    projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-e2e-remove-'));
+    projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-e2e-remove-'));
   }, TIMEOUT);
 
   afterAll(() => {
@@ -1240,13 +1240,13 @@ describe('remove-recipe E2E', () => {
   it(
     'should add swagger, build, remove swagger, build — both succeed',
     () => {
-      const spoonfeederBin = path.resolve(__dirname, '../../../dist/index.js');
+      const spoonfeedBin = path.resolve(__dirname, '../../../dist/index.js');
 
-      // Step 1: Generate a base project using spoonfeeder
+      // Step 1: Generate a base project using spoonfeed
       run(
         'node',
         [
-          spoonfeederBin,
+          spoonfeedBin,
           '--name',
           'e2e-test',
           '--project-type',
@@ -1263,7 +1263,7 @@ describe('remove-recipe E2E', () => {
 
       // Verify base project files exist
       expect(fs.existsSync(path.join(projectDir, 'package.json'))).toBe(true);
-      expect(fs.existsSync(path.join(projectDir, '.spoonfeeder.json'))).toBe(true);
+      expect(fs.existsSync(path.join(projectDir, '.spoonfeed.json'))).toBe(true);
       expect(fs.existsSync(path.join(projectDir, 'src/app.module.ts'))).toBe(true);
 
       // Step 2: Install dependencies
@@ -1275,7 +1275,7 @@ describe('remove-recipe E2E', () => {
       // Step 4: Add swagger recipe using nx generator
       run(
         'npx',
-        ['nx', 'g', 'spoonfeeder:add', 'swagger', '--no-interactive'],
+        ['nx', 'g', 'spoonfeed:add', 'swagger', '--no-interactive'],
         projectDir,
       );
 
@@ -1287,7 +1287,7 @@ describe('remove-recipe E2E', () => {
 
       // Verify swagger is in manifest
       const manifestAfterAdd = JSON.parse(
-        fs.readFileSync(path.join(projectDir, '.spoonfeeder.json'), 'utf-8'),
+        fs.readFileSync(path.join(projectDir, '.spoonfeed.json'), 'utf-8'),
       );
       expect(manifestAfterAdd.recipes['swagger']).toBeDefined();
 
@@ -1300,7 +1300,7 @@ describe('remove-recipe E2E', () => {
       // Step 7: Remove swagger recipe
       run(
         'npx',
-        ['nx', 'g', 'spoonfeeder:remove', 'swagger', '--no-interactive'],
+        ['nx', 'g', 'spoonfeed:remove', 'swagger', '--no-interactive'],
         projectDir,
       );
 
@@ -1312,7 +1312,7 @@ describe('remove-recipe E2E', () => {
 
       // Verify swagger is gone from manifest
       const manifestAfterRemove = JSON.parse(
-        fs.readFileSync(path.join(projectDir, '.spoonfeeder.json'), 'utf-8'),
+        fs.readFileSync(path.join(projectDir, '.spoonfeed.json'), 'utf-8'),
       );
       expect(manifestAfterRemove.recipes['swagger']).toBeUndefined();
 
@@ -1338,13 +1338,13 @@ pnpm test:e2e -- --testPathPattern="remove-recipe.e2e"
 
 Expected: 1 test passes. This test takes ~60-90 seconds due to `pnpm install` + `pnpm build` cycles.
 
-> **Note:** If the spoonfeeder CLI does not support `--no-recipes` or `--no-ci-cd` flags, adjust the generation command to match the actual CLI interface. The key requirement is generating a minimal project without interactive prompts.
+> **Note:** If the spoonfeed CLI does not support `--no-recipes` or `--no-ci-cd` flags, adjust the generation command to match the actual CLI interface. The key requirement is generating a minimal project without interactive prompts.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add tests/e2e/spoonfeeder/remove-recipe.e2e.spec.ts
-git commit -m "test(spoonfeeder): add remove-recipe e2e test (add/build/remove/build)"
+git add tests/e2e/spoonfeed/remove-recipe.e2e.spec.ts
+git commit -m "test(spoonfeed): add remove-recipe e2e test (add/build/remove/build)"
 ```
 
 ---
@@ -1367,10 +1367,10 @@ pnpm test -- --testPathPattern="integration"
 
 Expected: all integration tests pass including the new round-trip tests.
 
-- [ ] **Step 3: Build spoonfeeder**
+- [ ] **Step 3: Build spoonfeed**
 
 ```bash
-pnpm --filter spoonfeeder build
+pnpm --filter spoonfeed build
 ```
 
 Expected: compiles with no errors.

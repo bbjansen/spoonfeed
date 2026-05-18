@@ -23,7 +23,7 @@ Contributions are welcome. Follow the steps below to get started.
 ## Project Structure
 
 ```
-spoonfeeder/
+spoonfeed/
 ├── src/                          # CLI source code
 │   ├── index.ts                  # Entry point
 │   ├── types.ts                  # Shared types (ProjectType, RecipeId, RecipeDefinition, etc.)
@@ -239,4 +239,4 @@ Examples: `feature/add-redis-recipe`, `fix/template-path-resolution`
 
 ## Reporting Issues
 
-Open an issue at [github.com/bbjansen/spoonfeeder/issues](https://github.com/bbjansen/spoonfeeder/issues) with a clear description and steps to reproduce.
+Open an issue at [github.com/bbjansen/spoonfeed/issues](https://github.com/bbjansen/spoonfeed/issues) with a clear description and steps to reproduce.

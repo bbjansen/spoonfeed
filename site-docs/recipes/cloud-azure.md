@@ -1,6 +1,6 @@
 # Cloud — Azure Recipes
 
-Spoonfeeder provides 10 Azure recipes covering messaging, storage, databases, authentication, secrets, monitoring, caching, CDN, and serverless. Use these recipes when deploying to Microsoft Azure infrastructure. Each recipe wraps an official `@azure/*` client behind a NestJS injectable service.
+spoonfeed provides 10 Azure recipes covering messaging, storage, databases, authentication, secrets, monitoring, caching, CDN, and serverless. Use these recipes when deploying to Microsoft Azure infrastructure. Each recipe wraps an official `@azure/*` client behind a NestJS injectable service.
 
 All Azure recipes use the official `@azure/*` packages with exact version pinning. Most use `@azure/identity` for `DefaultAzureCredential` support, enabling managed identity authentication in production.
 

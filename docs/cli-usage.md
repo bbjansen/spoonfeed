@@ -1,12 +1,12 @@
-# CLI Usage -- spoonfeeder Scaffolder
+# CLI Usage -- spoonfeed Scaffolder
 
 ## Quick Start
 
 ```bash
 git clone <repo-url>
-cd spoonfeeder
+cd spoonfeed
 pnpm install
-pnpm create-spoonfeeder
+pnpm create-spoonfeed
 ```
 
 The CLI launches an interactive wizard that walks you through project setup.
@@ -113,7 +113,7 @@ Selecting a conflicting recipe automatically deselects the previous choice with 
 ## Example: HTTP API with Swagger + Postgres
 
 ```text
-$ pnpm create-spoonfeeder
+$ pnpm create-spoonfeed
 
 ? Project name: order-service
 ? Project type: http-api

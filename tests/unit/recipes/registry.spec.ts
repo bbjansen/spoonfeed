@@ -1,5 +1,5 @@
-import { RecipeRegistry } from '@spoonfeeder/recipes/registry';
-import type { RecipeDefinition } from '@spoonfeeder/types';
+import { RecipeRegistry } from '@spoonfeed/recipes/registry';
+import type { RecipeDefinition } from '@spoonfeed/types';
 
 const mockRecipe: RecipeDefinition = {
   id: 'swagger',

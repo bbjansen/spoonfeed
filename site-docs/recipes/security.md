@@ -1,6 +1,6 @@
 # Security Recipes
 
-Spoonfeeder provides 6 security recipes covering HTTP headers, request protection, content integrity, and data privacy. Apply these recipes to harden your API against common attack vectors. Most require no external services and add protection through guards, interceptors, and middleware.
+spoonfeed provides 6 security recipes covering HTTP headers, request protection, content integrity, and data privacy. Apply these recipes to harden your API against common attack vectors. Most require no external services and add protection through guards, interceptors, and middleware.
 
 !!! tip "Recommended baseline"
     Every production API should include at minimum: `throttler` + `helmet` + `cors`. Add `csrf` for browser-facing applications and `data-masking` for apps that handle PII.

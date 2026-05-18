@@ -1,10 +1,10 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { generate } from '@spoonfeeder/generator/generator';
-import { RecipeRegistry } from '@spoonfeeder/recipes/registry';
-import { registerAllRecipes } from '@spoonfeeder/recipes/definitions';
-import type { ProjectConfig } from '@spoonfeeder/types';
+import { generate } from '@spoonfeed/generator/generator';
+import { RecipeRegistry } from '@spoonfeed/recipes/registry';
+import { registerAllRecipes } from '@spoonfeed/recipes/definitions';
+import type { ProjectConfig } from '@spoonfeed/types';
 
 // Suppress @clack/prompts spinner output in tests
 jest.mock('@clack/prompts', () => ({
@@ -53,7 +53,7 @@ describe('Generator: base output', () => {
   let registry: RecipeRegistry;
 
   beforeEach(() => {
-    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-test-'));
+    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-test-'));
     registry = createRegistry();
   });
 
@@ -147,7 +147,7 @@ describe('Generator: project types', () => {
   let registry: RecipeRegistry;
 
   beforeEach(() => {
-    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-test-'));
+    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-test-'));
     registry = createRegistry();
   });
 
@@ -213,7 +213,7 @@ describe('Generator: recipe merging', () => {
   let registry: RecipeRegistry;
 
   beforeEach(() => {
-    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-test-'));
+    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-test-'));
     registry = createRegistry();
   });
 
@@ -318,7 +318,7 @@ describe('Generator: deployment and ci-cd', () => {
   let registry: RecipeRegistry;
 
   beforeEach(() => {
-    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-test-'));
+    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-test-'));
     registry = createRegistry();
   });
 
@@ -362,7 +362,7 @@ describe('Generator: edge cases', () => {
   let registry: RecipeRegistry;
 
   beforeEach(() => {
-    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeeder-test-'));
+    outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-test-'));
     registry = createRegistry();
   });
 

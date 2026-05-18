@@ -1,6 +1,6 @@
 # Cloud — GCP Recipes
 
-Spoonfeeder provides 10 GCP recipes covering messaging, storage, databases, authentication, secrets, logging, caching, CDN, and serverless. Use these recipes when deploying to Google Cloud Platform infrastructure. Each recipe wraps an official `@google-cloud/*` client behind a NestJS injectable service.
+spoonfeed provides 10 GCP recipes covering messaging, storage, databases, authentication, secrets, logging, caching, CDN, and serverless. Use these recipes when deploying to Google Cloud Platform infrastructure. Each recipe wraps an official `@google-cloud/*` client behind a NestJS injectable service.
 
 All GCP recipes use the official `@google-cloud/*` packages with exact version pinning.
 

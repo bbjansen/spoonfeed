@@ -5,20 +5,20 @@ Migrate between compatible recipes in a single operation. The generator removes 
 ## Usage
 
 ```bash
-nx g spoonfeeder:migrate --from=<recipe-id> --to=<recipe-id>
+nx g spoonfeed:migrate --from=<recipe-id> --to=<recipe-id>
 ```
 
 ## Examples
 
 ```bash
 # Migrate from TypeORM to Prisma
-nx g spoonfeeder:migrate --from=typeorm-postgres --to=prisma
+nx g spoonfeed:migrate --from=typeorm-postgres --to=prisma
 
 # Migrate from Pino to Winston
-nx g spoonfeeder:migrate --from=pino --to=winston
+nx g spoonfeed:migrate --from=pino --to=winston
 
 # Migrate from Nodemailer to SendGrid
-nx g spoonfeeder:migrate --from=nodemailer --to=sendgrid
+nx g spoonfeed:migrate --from=nodemailer --to=sendgrid
 ```
 
 ## What It Does
@@ -64,7 +64,7 @@ Suppose your project uses `typeorm-postgres` and you want to switch to Prisma.
 ### 1. Run the migration
 
 ```bash
-nx g spoonfeeder:migrate --from=typeorm-postgres --to=prisma
+nx g spoonfeed:migrate --from=typeorm-postgres --to=prisma
 ```
 
 ### 2. What changes
@@ -75,7 +75,7 @@ nx g spoonfeeder:migrate --from=typeorm-postgres --to=prisma
 - `src/app.module.ts`: `TypeOrmModule` import removed
 - `.env.example`: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME` variables removed
 - AI context files: TypeORM sections removed
-- `.spoonfeeder.json`: `typeorm-postgres` entry removed
+- `.spoonfeed.json`: `typeorm-postgres` entry removed
 
 **Step 2 — Add `prisma`:**
 
@@ -83,7 +83,7 @@ nx g spoonfeeder:migrate --from=typeorm-postgres --to=prisma
 - `src/app.module.ts`: `PrismaModule` import added
 - `.env.example`: `DATABASE_URL` variable added
 - AI context files: Prisma sections appended
-- `.spoonfeeder.json`: `prisma` entry added
+- `.spoonfeed.json`: `prisma` entry added
 
 **package.json before and after:**
 

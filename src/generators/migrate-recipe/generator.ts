@@ -3,7 +3,7 @@ import type { MigrateRecipeGeneratorSchema } from './schema.js';
 import { RecipeRegistry } from '../../recipes/registry.js';
 import { registerAllRecipes } from '../../recipes/definitions.js';
 import type { RecipeDefinition, RecipeId } from '../../types.js';
-import type { SpoonfeederManifest } from '../../utils/recipe-manifest.js';
+import type { SpoonfeedManifest } from '../../utils/recipe-manifest.js';
 import { findDependents } from '../../utils/dependency-checker.js';
 import removeRecipeGenerator from '../remove-recipe/generator.js';
 import addRecipeGenerator from '../add-recipe/generator.js';
@@ -58,12 +58,12 @@ export default async function migrateRecipeGenerator(
   registerAllRecipes(registry);
 
   // Read manifest
-  const manifestPath = '.spoonfeeder.json';
+  const manifestPath = '.spoonfeed.json';
   if (!tree.exists(manifestPath)) {
-    throw new Error('.spoonfeeder.json not found. Is this a spoonfeeder-generated project?');
+    throw new Error('.spoonfeed.json not found. Is this a spoonfeed-generated project?');
   }
 
-  const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeederManifest;
+  const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeedManifest;
 
   const installedRecipeIds = Object.keys(manifest.recipes);
 

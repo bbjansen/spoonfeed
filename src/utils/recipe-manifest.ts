@@ -13,29 +13,29 @@ export interface RecipeManifestEntry {
   };
 }
 
-export interface SpoonfeederManifest {
+export interface SpoonfeedManifest {
   projectType: string;
   cloudProvider: string;
-  spoonfeederVersion: string;
+  spoonfeedVersion: string;
   generatedAt: string;
   recipes: Record<string, RecipeManifestEntry>;
 }
 
-const MANIFEST_FILE = '.spoonfeeder.json';
+const MANIFEST_FILE = '.spoonfeed.json';
 
-export function readManifest(projectDir: string): SpoonfeederManifest | null {
+export function readManifest(projectDir: string): SpoonfeedManifest | null {
   const filePath = path.join(projectDir, MANIFEST_FILE);
   if (!fs.existsSync(filePath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as SpoonfeederManifest;
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as SpoonfeedManifest;
   } catch (e) {
     throw new Error(
-      `.spoonfeeder.json contains invalid JSON: ${e instanceof Error ? e.message : String(e)}`,
+      `.spoonfeed.json contains invalid JSON: ${e instanceof Error ? e.message : String(e)}`,
     );
   }
 }
 
-export function writeManifest(projectDir: string, manifest: SpoonfeederManifest): void {
+export function writeManifest(projectDir: string, manifest: SpoonfeedManifest): void {
   const filePath = path.join(projectDir, MANIFEST_FILE);
   fs.writeFileSync(filePath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
 }
@@ -46,12 +46,12 @@ export function addRecipeToManifest(
   entry: Omit<RecipeManifestEntry, 'installedAt' | 'version'>,
 ): void {
   const manifest = readManifest(projectDir);
-  if (!manifest) throw new Error('.spoonfeeder.json not found');
+  if (!manifest) throw new Error('.spoonfeed.json not found');
 
   manifest.recipes[recipeId] = {
     ...entry,
     installedAt: new Date().toISOString(),
-    version: manifest.spoonfeederVersion ?? '0.0.1',
+    version: manifest.spoonfeedVersion ?? '0.0.1',
   };
 
   writeManifest(projectDir, manifest);
@@ -59,7 +59,7 @@ export function addRecipeToManifest(
 
 export function removeRecipeFromManifest(projectDir: string, recipeId: string): void {
   const manifest = readManifest(projectDir);
-  if (!manifest) throw new Error('.spoonfeeder.json not found');
+  if (!manifest) throw new Error('.spoonfeed.json not found');
 
   delete manifest.recipes[recipeId];
   writeManifest(projectDir, manifest);

@@ -1,6 +1,6 @@
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { Tree, readJson, updateJson } from '@nx/devkit';
-import removeRecipeGenerator from '@spoonfeeder/generators/remove-recipe/generator';
+import removeRecipeGenerator from '@spoonfeed/generators/remove-recipe/generator';
 
 type ManifestJson = {
   projectType: string;
@@ -27,12 +27,12 @@ function seedProject(
   recipeEntry: Record<string, unknown> = {},
 ): void {
   tree.write(
-    '.spoonfeeder.json',
+    '.spoonfeed.json',
     JSON.stringify(
       {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           [recipeId]: {
@@ -68,7 +68,7 @@ describe('remove-recipe generator', () => {
 
   it('should throw if manifest does not exist', async () => {
     await expect(removeRecipeGenerator(tree, { recipe: 'swagger' })).rejects.toThrow(
-      '.spoonfeeder.json not found',
+      '.spoonfeed.json not found',
     );
   });
 
@@ -95,7 +95,7 @@ describe('remove-recipe generator', () => {
 
     await removeRecipeGenerator(tree, { recipe: 'swagger' });
 
-    const manifest = typedReadJson<ManifestJson>(tree, '.spoonfeeder.json');
+    const manifest = typedReadJson<ManifestJson>(tree, '.spoonfeed.json');
     expect(manifest.recipes['swagger']).toBeUndefined();
   });
 
@@ -197,10 +197,10 @@ SWAGGER_PATH=api/docs
 
 Always use pnpm.
 
-<!-- @spoonfeeder:swagger -->
+<!-- @spoonfeed:swagger -->
 ## Swagger / OpenAPI
 Swagger UI is available at /{SWAGGER_PATH}.
-<!-- @spoonfeeder:end:swagger -->
+<!-- @spoonfeed:end:swagger -->
 `,
     );
 
@@ -228,7 +228,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
     const manifest = {
       projectType: 'http-api',
       cloudProvider: 'aws',
-      spoonfeederVersion: '0.0.1',
+      spoonfeedVersion: '0.0.1',
       generatedAt: '2026-05-12T10:00:00Z',
       recipes: {
         swagger: {
@@ -250,7 +250,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
       },
     };
 
-    tree.write('.spoonfeeder.json', JSON.stringify(manifest, null, 2));
+    tree.write('.spoonfeed.json', JSON.stringify(manifest, null, 2));
     tree.write(
       'package.json',
       JSON.stringify(
@@ -278,7 +278,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
       const manifest = {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           'jwt-auth': {
@@ -296,7 +296,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
         },
       };
 
-      tree.write('.spoonfeeder.json', JSON.stringify(manifest, null, 2));
+      tree.write('.spoonfeed.json', JSON.stringify(manifest, null, 2));
       tree.write(
         'package.json',
         JSON.stringify({ name: 'test', dependencies: {}, devDependencies: {} }, null, 2),
@@ -312,7 +312,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
       const manifest = {
         projectType: 'http-api',
         cloudProvider: 'aws',
-        spoonfeederVersion: '0.0.1',
+        spoonfeedVersion: '0.0.1',
         generatedAt: '2026-05-12T10:00:00Z',
         recipes: {
           'jwt-auth': {
@@ -330,7 +330,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
         },
       };
 
-      tree.write('.spoonfeeder.json', JSON.stringify(manifest, null, 2));
+      tree.write('.spoonfeed.json', JSON.stringify(manifest, null, 2));
       tree.write(
         'package.json',
         JSON.stringify({ name: 'test', dependencies: {}, devDependencies: {} }, null, 2),
@@ -338,7 +338,7 @@ Swagger UI is available at /{SWAGGER_PATH}.
 
       await removeRecipeGenerator(tree, { recipe: 'jwt-auth', force: true });
 
-      const updated = typedReadJson<ManifestJson>(tree, '.spoonfeeder.json');
+      const updated = typedReadJson<ManifestJson>(tree, '.spoonfeed.json');
       expect(updated.recipes['jwt-auth']).toBeUndefined();
       expect(updated.recipes['auth-flows']).toBeDefined();
     });

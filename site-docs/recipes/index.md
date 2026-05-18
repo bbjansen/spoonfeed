@@ -1,6 +1,6 @@
 # Recipe System
 
-Recipes are the building blocks of a spoonfeeder project. Each recipe encapsulates a single capability — a database integration, an auth strategy, a cloud service — and ships everything needed to use it: dependencies, source files, configuration, environment variables, tests, and AI context.
+Recipes are the building blocks of a spoonfeed project. Each recipe encapsulates a single capability — a database integration, an auth strategy, a cloud service — and ships everything needed to use it: dependencies, source files, configuration, environment variables, tests, and AI context.
 
 ## Recipe Lifecycle
 
@@ -26,7 +26,7 @@ flowchart LR
 
 ## How Recipes Work
 
-When you select a recipe during scaffolding, spoonfeeder:
+When you select a recipe during scaffolding, spoonfeed:
 
 1. **Adds dependencies** to `package.json` with exact versions (no `^` or `~`)
 2. **Generates source files** from templates into the correct directories
@@ -47,7 +47,7 @@ The CLI validates all three constraints before generating. If you select an inco
 
 ## Smart Defaults
 
-When you select a cloud provider, spoonfeeder pre-selects relevant recipes:
+When you select a cloud provider, spoonfeed pre-selects relevant recipes:
 
 - **AWS** — Highlights AWS SQS, SNS, S3, Cognito, Secrets Manager, and other AWS services
 - **GCP** — Highlights Pub/Sub, Cloud SQL, Firestore, Cloud Functions, and other GCP services

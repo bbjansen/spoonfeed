@@ -1,6 +1,6 @@
 # Standards Compliance
 
-Spoonfeeder implements, supports, and recommends a range of RFCs and open standards. This page tracks which standards are covered, organized by category, with links to the original specifications.
+spoonfeed implements, supports, and recommends a range of RFCs and open standards. This page tracks which standards are covered, organized by category, with links to the original specifications.
 
 ## Standards Map
 
