@@ -27,6 +27,10 @@ export const FRONTEND_FRAMEWORKS = ['nextjs', 'vite-react', 'nuxt', 'sveltekit']
 
 export type FrontendFramework = (typeof FRONTEND_FRAMEWORKS)[number];
 
+export const HTTP_ADAPTERS = ['fastify', 'express'] as const;
+
+export type HttpAdapter = (typeof HTTP_ADAPTERS)[number];
+
 export const CLOUD_PROVIDERS = ['aws', 'gcp', 'azure', 'none'] as const;
 
 export type CloudProvider = (typeof CLOUD_PROVIDERS)[number];
@@ -178,6 +182,7 @@ export interface ProjectConfig {
   scope: string | undefined;
   projectType: ProjectType;
   cloudProvider: CloudProvider;
+  httpAdapter: HttpAdapter;
   recipes: RecipeId[];
   transportLayer: TransportLayer | undefined;
   frontendFramework: FrontendFramework | undefined;
@@ -220,8 +225,10 @@ export interface RecipeDefinition {
   claudeMdSection: string;
   cursorRules: string;
   copilotInstructions: string;
+  expressDependencies?: Record<string, string>;
   moduleImport?: ModuleImportMeta;
   mainTsSetup?: MainTsSetup;
+  expressMainTsSetup?: MainTsSetup;
 }
 
 export interface EnvVar {

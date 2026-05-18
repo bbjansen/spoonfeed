@@ -1,7 +1,7 @@
 import type { RecipeRegistry } from './registry.js';
 import type { RecipeDefinition } from '../types.js';
 
-const recipes: RecipeDefinition[] = [
+export const recipeDefinitions: RecipeDefinition[] = [
   // ─── Database ───────────────────────────────────────────────────────
   {
     id: 'typeorm-postgres',
@@ -93,7 +93,7 @@ const recipes: RecipeDefinition[] = [
         description: 'Prisma database connection URL',
       },
     ],
-    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'mongoose', 'drizzle-postgres', 'kysely', 'mikro-orm'],
+    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'mongoose', 'drizzle-postgres', 'kysely', 'mikro-orm', 'soft-delete', 'transactional-outbox'],
     requires: [],
     compatibleWith: 'all',
     templateDir: 'prisma',
@@ -128,7 +128,7 @@ const recipes: RecipeDefinition[] = [
         description: 'MongoDB connection URI',
       },
     ],
-    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'prisma', 'drizzle-postgres', 'kysely', 'mikro-orm'],
+    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'prisma', 'drizzle-postgres', 'kysely', 'mikro-orm', 'soft-delete', 'transactional-outbox'],
     requires: [],
     compatibleWith: 'all',
     templateDir: 'mongoose',
@@ -166,7 +166,7 @@ const recipes: RecipeDefinition[] = [
         description: 'PostgreSQL connection URL',
       },
     ],
-    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'prisma', 'mongoose', 'kysely', 'mikro-orm'],
+    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'prisma', 'mongoose', 'kysely', 'mikro-orm', 'soft-delete', 'transactional-outbox'],
     requires: [],
     compatibleWith: 'all',
     templateDir: 'drizzle-postgres',
@@ -206,6 +206,8 @@ const recipes: RecipeDefinition[] = [
       'mongoose',
       'drizzle-postgres',
       'mikro-orm',
+      'soft-delete',
+      'transactional-outbox',
     ],
     requires: [],
     compatibleWith: 'all',
@@ -238,7 +240,7 @@ const recipes: RecipeDefinition[] = [
       { key: 'DB_USERNAME', defaultValue: 'postgres', description: 'PostgreSQL username' },
       { key: 'DB_PASSWORD', defaultValue: 'postgres', description: 'PostgreSQL password' },
     ],
-    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'prisma', 'mongoose', 'drizzle-postgres', 'kysely'],
+    conflicts: ['typeorm-postgres', 'typeorm-mysql', 'prisma', 'mongoose', 'drizzle-postgres', 'kysely', 'soft-delete', 'transactional-outbox'],
     requires: [],
     compatibleWith: 'all',
     templateDir: 'mikro-orm',
@@ -301,7 +303,7 @@ const recipes: RecipeDefinition[] = [
     description: 'RabbitMQ message broker integration',
     category: 'Queue',
     dependencies: {
-      '@nestjs/microservices': '10.4.15',
+      '@nestjs/microservices': '11.1.19',
       amqplib: '0.10.5',
     },
     devDependencies: {
@@ -314,7 +316,7 @@ const recipes: RecipeDefinition[] = [
         description: 'RabbitMQ connection URL',
       },
     ],
-    conflicts: [],
+    conflicts: ['bullmq'],
     requires: [],
     compatibleWith: [
       'http-api',
@@ -353,7 +355,7 @@ const recipes: RecipeDefinition[] = [
       { key: 'REDIS_HOST', defaultValue: 'localhost', description: 'Redis host for BullMQ' },
       { key: 'REDIS_PORT', defaultValue: '6379', description: 'Redis port for BullMQ' },
     ],
-    conflicts: [],
+    conflicts: ['rabbitmq'],
     requires: [],
     compatibleWith: [
       'http-api',
@@ -609,6 +611,9 @@ const recipes: RecipeDefinition[] = [
       '@nestjs/swagger': '11.4.2',
       '@fastify/static': '8.1.0',
     },
+    expressDependencies: {
+      '@nestjs/swagger': '11.4.2',
+    },
     devDependencies: {},
     envVars: [
       { key: 'SWAGGER_ENABLED', defaultValue: 'true', description: 'Enable Swagger UI' },
@@ -736,7 +741,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: ['http-api', 'microservice', 'scheduled-worker', 'full-stack', 'monorepo'],
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'health-checks',
     claudeMdSection: [
       '## Health Checks',
@@ -886,7 +891,7 @@ const recipes: RecipeDefinition[] = [
       { key: 'S3_ACCESS_KEY_ID', defaultValue: 'minioadmin', description: 'S3/MinIO access key' },
       { key: 'S3_SECRET_ACCESS_KEY', defaultValue: 'minioadmin', description: 'S3/MinIO secret key' },
     ],
-    conflicts: [],
+    conflicts: ['aws-s3'],
     requires: [],
     compatibleWith: 'all',
     templateDir: 's3-minio',
@@ -991,8 +996,8 @@ const recipes: RecipeDefinition[] = [
     description: 'Real-time communication with Socket.IO',
     category: 'WebSockets',
     dependencies: {
-      '@nestjs/websockets': '10.4.15',
-      '@nestjs/platform-socket.io': '10.4.15',
+      '@nestjs/websockets': '11.1.19',
+      '@nestjs/platform-socket.io': '11.1.19',
       'socket.io': '4.8.3',
     },
     devDependencies: {},
@@ -1099,7 +1104,7 @@ const recipes: RecipeDefinition[] = [
     ],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'throttler',
     claudeMdSection: [
       '## Rate Limiting',
@@ -1118,16 +1123,19 @@ const recipes: RecipeDefinition[] = [
   {
     id: 'helmet',
     name: 'Helmet',
-    description: 'HTTP security headers with Fastify Helmet',
+    description: 'HTTP security headers',
     category: 'Security',
     dependencies: {
       '@fastify/helmet': '13.0.2',
+    },
+    expressDependencies: {
+      helmet: '8.1.0',
     },
     devDependencies: {},
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'helmet',
     claudeMdSection: [
       '## Helmet',
@@ -1135,11 +1143,11 @@ const recipes: RecipeDefinition[] = [
       'Customize header policies in the Helmet registration options.',
     ].join('\n'),
     cursorRules: [
-      'Helmet is registered as a Fastify plugin. Customize CSP and other policies as needed.',
+      'Helmet is registered in main.ts. Customize CSP and other policies as needed.',
       'Ensure CSP allows required script/style sources when using Swagger UI or frontends.',
     ].join('\n'),
     copilotInstructions: [
-      'Helmet applies security headers via @fastify/helmet. Configured in main.ts.',
+      'Helmet applies security headers. Configured in main.ts.',
       'Adjust CSP directives if Swagger UI or external resources are blocked.',
     ].join('\n'),
     mainTsSetup: {
@@ -1164,6 +1172,30 @@ const recipes: RecipeDefinition[] = [
   });`,
       },
     },
+    expressMainTsSetup: {
+      blockId: 'helmet',
+      block: {
+        imports: [
+          {
+            defaultImport: 'helmet',
+            namedImports: [],
+            moduleSpecifier: 'helmet',
+          },
+        ],
+        code: `  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:', 'validator.swagger.io'],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+        },
+      },
+    }),
+  );`,
+      },
+    },
   },
   {
     id: 'cors',
@@ -1181,7 +1213,7 @@ const recipes: RecipeDefinition[] = [
     ],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'cors',
     claudeMdSection: [
       '## CORS',
@@ -1193,24 +1225,28 @@ const recipes: RecipeDefinition[] = [
       'Configure credentials, methods, and headers in the CORS options in main.ts.',
     ].join('\n'),
     copilotInstructions: [
-      'CORS is configured in main.ts via Fastify CORS plugin. Origins from CORS_ORIGIN env var.',
+      'CORS is configured in main.ts via app.enableCors(). Origins from CORS_ORIGIN env var.',
       'Support comma-separated origins. Never use wildcard (*) in production environments.',
     ].join('\n'),
   },
   {
     id: 'csrf',
     name: 'CSRF Protection',
-    description: 'Cross-Site Request Forgery protection for Fastify',
+    description: 'Cross-Site Request Forgery protection',
     category: 'Security',
     dependencies: {
       '@fastify/csrf-protection': '7.0.1',
       '@fastify/cookie': '11.0.1',
     },
+    expressDependencies: {
+      'csrf-csrf': '3.0.6',
+      'cookie-parser': '1.4.7',
+    },
     devDependencies: {},
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'csrf',
     claudeMdSection: [
       '## CSRF Protection',
@@ -1218,11 +1254,11 @@ const recipes: RecipeDefinition[] = [
       'Exclude API routes that use bearer token auth from CSRF protection.',
     ].join('\n'),
     cursorRules: [
-      'CSRF protection is via @fastify/csrf-protection. Tokens are cookie-based.',
+      'CSRF protection is cookie-based. Check main.ts for the registration.',
       'API endpoints using JWT/API-key auth can skip CSRF. Browser-facing forms need it.',
     ].join('\n'),
     copilotInstructions: [
-      'CSRF protection uses @fastify/csrf-protection. Applied to browser-facing state-changing routes.',
+      'CSRF protection is applied to browser-facing state-changing routes. See main.ts for configuration.',
       'JWT/API-key protected endpoints can be excluded. Token is delivered via cookie.',
     ].join('\n'),
   },
@@ -1240,7 +1276,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'pagination',
     claudeMdSection: [
       '## Pagination',
@@ -1268,7 +1304,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'filtering',
     claudeMdSection: [
       '## Filtering',
@@ -1294,7 +1330,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'api-versioning',
     claudeMdSection: [
       '## API Versioning',
@@ -1320,7 +1356,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'correlation-id',
     claudeMdSection: [
       '## Correlation ID',
@@ -1347,7 +1383,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: ['http-api', 'full-stack', 'monorepo'],
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'http-caching',
     claudeMdSection:
       '## HTTP Caching\nUse @CacheControl() decorator on GET endpoints to set Cache-Control headers. Supports max-age, s-maxage, stale-while-revalidate, no-cache, no-store, private, public directives.',
@@ -1371,6 +1407,14 @@ const recipes: RecipeDefinition[] = [
       '@opentelemetry/resources': '1.30.0',
       '@opentelemetry/semantic-conventions': '1.28.0',
     },
+    expressDependencies: {
+      '@opentelemetry/sdk-node': '0.57.0',
+      '@opentelemetry/exporter-trace-otlp-http': '0.57.0',
+      '@opentelemetry/instrumentation-http': '0.57.0',
+      '@opentelemetry/instrumentation-express': '0.47.0',
+      '@opentelemetry/resources': '1.30.0',
+      '@opentelemetry/semantic-conventions': '1.28.0',
+    },
     devDependencies: {},
     envVars: [
       {
@@ -1386,7 +1430,7 @@ const recipes: RecipeDefinition[] = [
     ],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'opentelemetry',
     claudeMdSection: [
       '## OpenTelemetry',
@@ -1418,7 +1462,7 @@ const recipes: RecipeDefinition[] = [
     ],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'request-logging',
     claudeMdSection: [
       '## Request Logging',
@@ -2012,7 +2056,7 @@ const recipes: RecipeDefinition[] = [
       { key: 'AWS_REGION', defaultValue: 'eu-west-1', description: 'AWS region' },
       { key: 'S3_BUCKET', defaultValue: 'my-bucket', description: 'S3 bucket name' },
     ],
-    conflicts: [],
+    conflicts: ['s3-minio'],
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/s3',
@@ -2976,7 +3020,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: ['http-api', 'full-stack', 'monorepo'],
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'prefer-header',
     claudeMdSection:
       '## Prefer Header (RFC 7240)\nThe PreferInterceptor parses the Prefer request header and applies return=minimal (204 No Content), return=representation (full body), and respond-async preferences. Applied preferences are echoed in the Preference-Applied response header.',
@@ -2995,7 +3039,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: ['http-api', 'full-stack', 'monorepo'],
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'content-digest',
     claudeMdSection:
       '## Content Digest (RFC 9530)\nContentDigestInterceptor adds sha-256 Content-Digest and Repr-Digest response headers for payload integrity. ContentDigestGuard optionally validates inbound Content-Digest headers on requests.',
@@ -3014,7 +3058,7 @@ const recipes: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: ['http-api', 'full-stack', 'monorepo'],
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'dpop',
     claudeMdSection:
       '## DPoP (RFC 9449)\nDPoPGuard validates DPoP proof JWTs on protected endpoints. It checks the proof typ, htm (method), htu (URI), and token age. Apply the guard to routes that require proof-of-possession tokens.',
@@ -3094,7 +3138,7 @@ const recipes: RecipeDefinition[] = [
   {
     id: 'soft-delete',
     name: 'Soft Delete',
-    description: 'Mark records as deleted instead of removing them',
+    description: 'Mark records as deleted instead of removing them (TypeORM)',
     category: 'Database',
     dependencies: {
       '@nestjs/typeorm': '10.0.2',
@@ -3102,7 +3146,7 @@ const recipes: RecipeDefinition[] = [
     },
     devDependencies: {},
     envVars: [],
-    conflicts: [],
+    conflicts: ['prisma', 'mongoose', 'drizzle-postgres', 'kysely', 'mikro-orm'],
     requires: [],
     compatibleWith: 'all',
     templateDir: 'soft-delete',
@@ -3349,7 +3393,7 @@ const recipes: RecipeDefinition[] = [
   {
     id: 'transactional-outbox',
     name: 'Transactional Outbox',
-    description: 'Guarantee at-least-once event delivery alongside database writes',
+    description: 'Guarantee at-least-once event delivery alongside database writes (TypeORM)',
     category: 'Database',
     dependencies: {
       '@nestjs/typeorm': '10.0.2',
@@ -3357,7 +3401,7 @@ const recipes: RecipeDefinition[] = [
     },
     devDependencies: {},
     envVars: [],
-    conflicts: [],
+    conflicts: ['prisma', 'mongoose', 'drizzle-postgres', 'kysely', 'mikro-orm'],
     requires: [],
     compatibleWith: ['http-api', 'microservice', 'scheduled-worker', 'full-stack', 'monorepo'],
     templateDir: 'transactional-outbox',
@@ -3627,7 +3671,12 @@ const recipes: RecipeDefinition[] = [
     dependencies: {
       '@fastify/multipart': '9.0.3',
     },
-    devDependencies: {},
+    expressDependencies: {
+      multer: '1.4.5-lts.2',
+    },
+    devDependencies: {
+      '@types/multer': '2.1.0',
+    },
     envVars: [
       {
         key: 'MAX_FILE_SIZE_MB',
@@ -3641,16 +3690,16 @@ const recipes: RecipeDefinition[] = [
     templateDir: 'file-upload',
     claudeMdSection: [
       '## File Upload',
-      'Register @fastify/multipart in `main.ts`. Use `FileUploadInterceptor` on upload routes.',
+      'Use `FileUploadInterceptor` on upload routes.',
       'Validate files with `FileValidationPipe` — configure allowed MIME types and max size.',
       'Access the uploaded file via `(request as any).uploadedFile` after the interceptor runs.',
     ].join('\n'),
     cursorRules: [
-      'Use FileUploadInterceptor + FileValidationPipe for multipart uploads. Register @fastify/multipart in main.ts.',
+      'Use FileUploadInterceptor + FileValidationPipe for multipart uploads.',
       'Access uploaded file from request.uploadedFile. Configure MAX_FILE_SIZE_MB in environment.',
     ].join('\n'),
     copilotInstructions: [
-      'File uploads use @fastify/multipart with a custom interceptor and validation pipe.',
+      'File uploads use a custom FileUploadInterceptor and FileValidationPipe.',
       'FileUploadInterceptor extracts the file, FileValidationPipe checks MIME type and size.',
     ].join('\n'),
   },
@@ -3697,14 +3746,17 @@ const recipes: RecipeDefinition[] = [
     dependencies: {
       adminjs: '7.8.13',
       '@adminjs/nestjs': '6.1.0',
+      '@adminjs/fastify': '4.1.0',
+    },
+    expressDependencies: {
+      adminjs: '7.8.13',
+      '@adminjs/nestjs': '6.1.0',
       '@adminjs/express': '6.1.0',
       express: '5.1.0',
       'express-session': '1.18.1',
       'express-formidable': '1.2.0',
     },
-    devDependencies: {
-      '@types/express-session': '1.18.1',
-    },
+    devDependencies: {},
     envVars: [
       {
         key: 'ADMIN_EMAIL',
@@ -3731,7 +3783,7 @@ const recipes: RecipeDefinition[] = [
 ];
 
 export function registerAllRecipes(registry: RecipeRegistry): void {
-  for (const recipe of recipes) {
+  for (const recipe of recipeDefinitions) {
     registry.register(recipe);
   }
 }

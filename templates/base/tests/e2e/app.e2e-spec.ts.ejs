@@ -1,8 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
+<% if (httpAdapter === 'express') { %>
+import { INestApplication } from '@nestjs/common';
+<% } else { %>
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+<% } %>
 import { AppModule } from '@/app.module';
 
 describe('App (e2e)', () => {
+<% if (httpAdapter === 'express') { %>
+  let app: INestApplication;
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+<% } else { %>
   let app: NestFastifyApplication;
 
   beforeEach(async () => {
@@ -14,6 +30,7 @@ describe('App (e2e)', () => {
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
   });
+<% } %>
 
   afterEach(async () => {
     await app.close();

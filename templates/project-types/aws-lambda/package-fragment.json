@@ -1,7 +1,4 @@
 {
-  "dependencies": {
-    "@fastify/aws-lambda": "5.1.4"
-  },
   "devDependencies": {
     "@types/aws-lambda": "8.10.147"
   }

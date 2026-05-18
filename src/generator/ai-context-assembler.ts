@@ -10,17 +10,35 @@ export async function assembleClaudeMd(
   const sections = [
     '# CLAUDE.md',
     '',
+    '## Project',
+    '',
+    `**${config.scope ? config.scope + '/' : ''}${config.name}** — a ${config.projectType} project.`,
+    ...(config.projectType === 'full-stack'
+      ? [
+          '',
+          'Workspace layout:',
+          '- `apps/api/` — NestJS API (backend)',
+          `- \`apps/web/\` — ${config.frontendFramework ?? 'frontend'} (frontend)`,
+        ]
+      : config.projectType === 'monorepo'
+        ? [
+            '',
+            'Workspace layout:',
+            '- `apps/api/` — NestJS API',
+          ]
+        : []),
+    '',
     '## Package Manager',
     '',
     'Always use **pnpm**. Never use npm or yarn.',
     '',
     '## Imports',
     '',
-    'Use the `@/*` alias for all internal imports — it maps to `src/*`.',
-    '',
-    `## Project Type`,
-    '',
-    `This is a ${config.projectType} project.`,
+    (() => {
+      const isWorkspace = config.projectType === 'full-stack' || config.projectType === 'monorepo';
+      const aliasTarget = isWorkspace ? 'apps/api/src/*' : 'src/*';
+      return `Use the \`@/*\` alias for all internal imports — it maps to \`${aliasTarget}\`.`;
+    })(),
     '',
   ];
 
@@ -34,7 +52,12 @@ export async function assembleClaudeMd(
 
   for (const recipe of recipes) {
     if (recipe.claudeMdSection) {
-      sections.push(recipe.claudeMdSection, '');
+      sections.push(
+        `<!-- @spoonfeed:${recipe.id} -->`,
+        recipe.claudeMdSection,
+        `<!-- @spoonfeed:end:${recipe.id} -->`,
+        '',
+      );
     }
   }
 
@@ -58,17 +81,20 @@ export async function assembleCopilotInstructions(
   outputDir: string,
   recipes: RecipeDefinition[],
 ): Promise<void> {
-  const instructions = recipes
-    .filter((r) => r.copilotInstructions)
-    .map((r) => r.copilotInstructions);
+  const recipesWithInstructions = recipes.filter((r) => r.copilotInstructions);
 
-  if (instructions.length === 0) return;
+  if (recipesWithInstructions.length === 0) return;
+
+  const parts = recipesWithInstructions.map(
+    (r) =>
+      `<!-- @spoonfeed:${r.id} -->\n${r.copilotInstructions}\n<!-- @spoonfeed:end:${r.id} -->`,
+  );
 
   const githubDir = path.join(outputDir, '.github');
   await fs.ensureDir(githubDir);
   await fs.writeFile(
     path.join(githubDir, 'copilot-instructions.md'),
-    instructions.join('\n\n'),
+    parts.join('\n\n') + '\n',
     'utf-8',
   );
 }

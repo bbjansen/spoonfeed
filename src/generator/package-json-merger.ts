@@ -32,6 +32,11 @@ export function mergePackageJson(
     }
   }
 
+  // Remove packages from devDeps that are already in deps (runtime takes precedence)
+  for (const key of Object.keys(deps)) {
+    delete devDeps[key];
+  }
+
   result.dependencies = sortKeys(deps);
   result.devDependencies = sortKeys(devDeps);
   if (Object.keys(scripts).length > 0) {

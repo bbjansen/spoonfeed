@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   PROJECT_TYPES,
   CLOUD_PROVIDERS,
+  HTTP_ADAPTERS,
   TRANSPORT_LAYERS,
   FRONTEND_FRAMEWORKS,
   DEPLOYMENT_TARGETS,
@@ -9,6 +10,7 @@ import {
   RECIPE_IDS,
 } from '../types.js';
 import type { ProjectConfig } from '../types.js';
+import { recipeDefinitions } from '../recipes/definitions.js';
 
 const projectNameRegex = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -24,6 +26,7 @@ const projectConfigSchema = z
       .optional(),
     projectType: z.enum(PROJECT_TYPES),
     cloudProvider: z.enum(CLOUD_PROVIDERS),
+    httpAdapter: z.enum(HTTP_ADAPTERS).default('fastify'),
     recipes: z.array(z.enum(RECIPE_IDS)),
     transportLayer: z.enum(TRANSPORT_LAYERS).optional(),
     frontendFramework: z.enum(FRONTEND_FRAMEWORKS).optional(),
@@ -44,6 +47,64 @@ const projectConfigSchema = z
         code: 'custom',
         message: 'Frontend framework is required for full-stack projects',
         path: ['frontendFramework'],
+      });
+    }
+
+    // Recipe conflict validation
+    for (const recipeId of data.recipes) {
+      const def = recipeDefinitions.find((r) => r.id === recipeId);
+      if (!def) continue;
+
+      for (const conflictId of def.conflicts) {
+        if (data.recipes.includes(conflictId as (typeof data.recipes)[number])) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Recipe '${recipeId}' conflicts with '${conflictId}'`,
+            path: ['recipes'],
+          });
+        }
+      }
+    }
+
+    // Recipe requires validation
+    for (const recipeId of data.recipes) {
+      const def = recipeDefinitions.find((r) => r.id === recipeId);
+      if (!def) continue;
+
+      for (const requiredId of def.requires) {
+        if (!data.recipes.includes(requiredId as (typeof data.recipes)[number])) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Recipe '${recipeId}' requires '${requiredId}'`,
+            path: ['recipes'],
+          });
+        }
+      }
+    }
+
+    // Recipe compatibleWith validation
+    for (const recipeId of data.recipes) {
+      const def = recipeDefinitions.find((r) => r.id === recipeId);
+      if (!def) continue;
+
+      if (def.compatibleWith !== 'all' && !def.compatibleWith.includes(data.projectType)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Recipe '${recipeId}' is not compatible with project type '${data.projectType}'`,
+          path: ['recipes'],
+        });
+      }
+    }
+
+    // graphql-mercurius + Express validation
+    if (
+      data.recipes.includes('graphql-mercurius' as (typeof data.recipes)[number]) &&
+      data.httpAdapter === 'express'
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Recipe 'graphql-mercurius' requires the Fastify HTTP adapter`,
+        path: ['recipes'],
       });
     }
   });

@@ -1,3 +1,32 @@
+<% if (httpAdapter === 'express') { %>
+import { NestFactory } from '@nestjs/core';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
+
+  app.enableCors({ origin: process.env.CORS_ORIGIN?.split(',') ?? false });
+
+  app.enableShutdownHooks();
+
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+
+  new Logger('Bootstrap').log(`Application is running on http://localhost:${port}`);
+}
+
+void bootstrap();
+<% } else { %>
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -30,3 +59,4 @@ async function bootstrap() {
 }
 
 void bootstrap();
+<% } %>

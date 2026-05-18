@@ -40,13 +40,13 @@ export default defineConfig({
       ],
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/<%= packageScope ? packageScope + '/' : '' %><%= name %>' },
+      { icon: 'github', link: 'https://github.com/<%= packageScope ? packageScope.replace("@", "") + "/" : "" %><%= name %>' },
     ],
     search: {
       provider: 'local',
     },
     editLink: {
-      pattern: 'https://github.com/<%= packageScope ? packageScope + '/' : '' %><%= name %>/edit/main/docs/:path',
+      pattern: 'https://github.com/<%= packageScope ? packageScope.replace("@", "") + "/" : "" %><%= name %>/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
   },

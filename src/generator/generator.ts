@@ -4,8 +4,9 @@ import * as p from '@clack/prompts';
 import type { ProjectConfig, RecipeDefinition } from '../types.js';
 import { RecipeRegistry } from '../recipes/registry.js';
 import { renderTemplate } from './template-engine.js';
-import { mergePackageJson } from './package-json-merger.js';
-import { mergeEnvVars, renderEnvFile } from './env-merger.js';
+import { mergePackageJson, type PackageJsonFragment } from './package-json-merger.js';
+import { renderEnvFileWithSections } from './env-merger.js';
+import type { EnvSection } from './env-merger.js';
 import {
   assembleClaudeMd,
   assembleCursorRules,
@@ -93,12 +94,31 @@ export async function generate(
       packageScope: config.scope,
       projectType: config.projectType,
       cloudProvider: config.cloudProvider,
+      httpAdapter: config.httpAdapter,
       transportLayer: config.transportLayer,
       frontendFramework: config.frontendFramework,
     };
 
     // 1. Copy and render base templates
     await copyAndRenderDir(path.join(templatesDir, 'base'), outputDir, templateData);
+
+    // 1b. Remove HTTP-specific base files for non-HTTP project types
+    //     These files import from adapter packages that non-HTTP projects don't install.
+    const httpProjectTypes = new Set(['http-api', 'aws-lambda', 'full-stack', 'monorepo']);
+    if (!httpProjectTypes.has(config.projectType)) {
+      const httpOnlyFiles = [
+        'src/shared/filters/http-exception.filter.ts',
+        'src/shared/middleware/request-timeout.middleware.ts',
+        'tests/e2e/app.e2e-spec.ts',
+        'tests/unit/shared/filters/http-exception.filter.spec.ts',
+      ];
+      for (const file of httpOnlyFiles) {
+        const filePath = path.join(outputDir, file);
+        if (await fs.pathExists(filePath)) {
+          await fs.remove(filePath);
+        }
+      }
+    }
 
     // 2. Overlay project-type-specific templates (skip frontend/ — handled in step 2c)
     const projectTypeDir = path.join(templatesDir, 'project-types', config.projectType);
@@ -187,6 +207,7 @@ export async function generate(
     const projectTypeFragmentPath = path.join(projectTypeDir, 'package-fragment.json');
     const projectTypeFragment = (await fs.pathExists(projectTypeFragmentPath))
       ? ((await fs.readJson(projectTypeFragmentPath)) as {
+          scripts?: Record<string, string>;
           dependencies?: Record<string, string>;
           devDependencies?: Record<string, string>;
         })
@@ -219,7 +240,18 @@ export async function generate(
       }
     }
 
-    // 4b. Apply recipe main.ts blocks
+    // 4b. Load recipe-level package fragments (for scripts, etc.)
+    const recipeFragments: PackageJsonFragment[] = [];
+    for (const recipe of selectedRecipes) {
+      if (recipe.templateDir) {
+        const recipeFragmentPath = path.join(templatesDir, 'recipes', recipe.templateDir, 'package-fragment.json');
+        if (await fs.pathExists(recipeFragmentPath)) {
+          recipeFragments.push(await fs.readJson(recipeFragmentPath) as PackageJsonFragment);
+        }
+      }
+    }
+
+    // 4c. Apply recipe main.ts blocks
     const mainTsPath = isWorkspaceProject
       ? path.join(outputDir, 'apps', 'api', 'src', 'main.ts')
       : path.join(outputDir, 'src', 'main.ts');
@@ -227,11 +259,15 @@ export async function generate(
     if (await fs.pathExists(mainTsPath)) {
       let mainTsContent = await fs.readFile(mainTsPath, 'utf-8');
       for (const recipe of selectedRecipes) {
-        if (recipe.mainTsSetup) {
+        const setup =
+          config.httpAdapter === 'express' && recipe.expressMainTsSetup
+            ? recipe.expressMainTsSetup
+            : recipe.mainTsSetup;
+        if (setup) {
           mainTsContent = insertBlockToString(
             mainTsContent,
-            recipe.mainTsSetup.blockId,
-            recipe.mainTsSetup.block as BlockDefinition,
+            setup.blockId,
+            setup.block as BlockDefinition,
           );
           appliedMainTsBlocks.add(recipe.id);
         }
@@ -251,38 +287,116 @@ export async function generate(
       await copyAndRenderDir(ciCdDir, outputDir, templateData);
     }
 
-    // 7. Merge package.json with project-type and recipe fragments
+    // 7. Merge package.json with project-type, adapter, and recipe fragments
     const basePackageJson = (await fs.readJson(path.join(outputDir, 'package.json'))) as Record<
       string,
       unknown
     >;
+
+    // Adapter-specific runtime deps (project types with an HTTP server)
+    const isLambda = config.projectType === 'aws-lambda';
+    const adapterFragment = httpProjectTypes.has(config.projectType)
+      ? config.httpAdapter === 'express'
+        ? {
+            dependencies: {
+              '@nestjs/platform-express': '11.1.19',
+              express: '5.1.0',
+              ...(isLambda && { '@codegenie/serverless-express': '4.16.0' }),
+            } as Record<string, string>,
+          }
+        : {
+            dependencies: {
+              '@fastify/etag': '6.0.0',
+              '@nestjs/platform-fastify': '11.1.19',
+              fastify: '5.8.4',
+              ...(isLambda && { '@fastify/aws-lambda': '5.1.4' }),
+            } as Record<string, string>,
+          }
+      : undefined;
+
+    // Transport-specific runtime deps (microservice projects)
+    const transportDeps: Record<string, Record<string, string>> = {
+      redis: { ioredis: '5.6.1' },
+      nats: { nats: '2.29.1' },
+      mqtt: { mqtt: '5.10.7' },
+      rabbitmq: { amqplib: '0.10.5', '@types/amqplib': '0.10.6' },
+      kafka: { kafkajs: '2.2.4' },
+      grpc: { '@grpc/grpc-js': '1.13.5', '@grpc/proto-loader': '0.7.15' },
+    };
+    const transportFragment = config.transportLayer && transportDeps[config.transportLayer]
+      ? { dependencies: transportDeps[config.transportLayer] }
+      : undefined;
+
     const fragments = [
       ...(projectTypeFragment
         ? [
             {
+              scripts: projectTypeFragment.scripts ?? {},
               dependencies: projectTypeFragment.dependencies ?? {},
               devDependencies: projectTypeFragment.devDependencies ?? {},
             },
           ]
         : []),
+      ...(adapterFragment ? [adapterFragment] : []),
+      ...(transportFragment ? [transportFragment] : []),
       ...selectedRecipes.map((r) => ({
-        dependencies: r.dependencies,
+        dependencies:
+          config.httpAdapter === 'express' && r.expressDependencies
+            ? r.expressDependencies
+            : r.dependencies,
         devDependencies: r.devDependencies,
       })),
+      ...recipeFragments,
     ];
     const mergedPackageJson = mergePackageJson(basePackageJson, fragments);
     await fs.writeJson(path.join(outputDir, 'package.json'), mergedPackageJson, {
       spaces: 2,
     });
 
-    // 8. Merge env vars
+    // 8. Render env vars with per-recipe section markers
+    const transportEnvVars: Record<string, Array<{ key: string; defaultValue: string; description: string }>> = {
+      tcp: [
+        { key: 'TCP_HOST', defaultValue: '0.0.0.0', description: 'TCP transport host' },
+        { key: 'TCP_PORT', defaultValue: '3001', description: 'TCP transport port' },
+      ],
+      redis: [
+        { key: 'REDIS_HOST', defaultValue: 'localhost', description: 'Redis host' },
+        { key: 'REDIS_PORT', defaultValue: '6379', description: 'Redis port' },
+      ],
+      nats: [
+        { key: 'NATS_URL', defaultValue: 'nats://localhost:4222', description: 'NATS server URL' },
+      ],
+      mqtt: [
+        { key: 'MQTT_URL', defaultValue: 'mqtt://localhost:1883', description: 'MQTT broker URL' },
+      ],
+      rabbitmq: [
+        { key: 'RABBITMQ_URL', defaultValue: 'amqp://guest:guest@localhost:5672', description: 'RabbitMQ connection URL' },
+        { key: 'RABBITMQ_QUEUE', defaultValue: `${config.name}-queue`, description: 'RabbitMQ queue name' },
+      ],
+      kafka: [
+        { key: 'KAFKA_BROKERS', defaultValue: 'localhost:9092', description: 'Kafka broker addresses (comma-separated)' },
+      ],
+      grpc: [
+        { key: 'GRPC_URL', defaultValue: '0.0.0.0:5000', description: 'gRPC server URL' },
+      ],
+    };
     const baseEnvVars = [
-      { key: 'PORT', defaultValue: '3000', description: 'HTTP port' },
+      ...(httpProjectTypes.has(config.projectType)
+        ? [{ key: 'PORT', defaultValue: '3000', description: 'HTTP port' }]
+        : []),
       { key: 'NODE_ENV', defaultValue: 'development', description: 'Environment' },
+      ...(config.transportLayer && transportEnvVars[config.transportLayer]
+        ? transportEnvVars[config.transportLayer]
+        : []),
     ];
-    const recipeEnvVars = selectedRecipes.map((r) => r.envVars);
-    const mergedEnvVars = mergeEnvVars(baseEnvVars, recipeEnvVars);
-    await fs.writeFile(path.join(outputDir, '.env.example'), renderEnvFile(mergedEnvVars), 'utf-8');
+    const envSections: EnvSection[] = selectedRecipes
+      .filter((r) => r.envVars.length > 0)
+      .map((r) => ({ sectionName: r.name, vars: r.envVars }));
+    await fs.writeFile(
+      path.join(outputDir, '.env.example'),
+      renderEnvFileWithSections(baseEnvVars, envSections),
+      'utf-8',
+    );
 
     // 9. Assemble AI context
     await assembleClaudeMd(outputDir, config, selectedRecipes);
@@ -291,8 +405,13 @@ export async function generate(
 
     // 10. Create .spoonfeed.json manifest
     const manifest = {
+      name: config.name,
+      scope: config.scope,
       projectType: config.projectType,
       cloudProvider: config.cloudProvider,
+      httpAdapter: config.httpAdapter,
+      transportLayer: config.transportLayer,
+      frontendFramework: config.frontendFramework,
       spoonfeedVersion: '0.0.1',
       generatedAt: new Date().toISOString(),
       recipes: Object.fromEntries(
@@ -303,10 +422,16 @@ export async function generate(
               installedAt: new Date().toISOString(),
               version: '0.0.1',
               files: recipeFilesMap.get(recipe.id) ?? [],
-              ...(recipe.mainTsSetup &&
-                appliedMainTsBlocks.has(recipe.id) && {
-                  mainTsBlocks: [recipe.mainTsSetup.blockId],
+              ...(appliedMainTsBlocks.has(recipe.id) && {
+                  mainTsBlocks: [
+                    (config.httpAdapter === 'express' && recipe.expressMainTsSetup
+                      ? recipe.expressMainTsSetup
+                      : recipe.mainTsSetup
+                    )!.blockId,
+                  ],
                 }),
+              ...(recipe.envVars.length > 0 && { envSection: recipe.name }),
+              ...(recipe.moduleImport && { moduleImport: recipe.moduleImport }),
             },
           ];
         }),

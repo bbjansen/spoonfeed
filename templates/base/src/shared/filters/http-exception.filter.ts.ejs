@@ -1,0 +1,156 @@
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
+<% if (httpAdapter === 'express') { %>
+import type { Request, Response } from 'express';
+<% } else { %>
+import { FastifyReply, FastifyRequest } from 'fastify';
+<% } %>
+import { ApplicationError } from '@/shared/errors/application.error';
+
+const HTTP_STATUS_CODES: Record<number, string> = {
+  400: 'BAD_REQUEST',
+  401: 'UNAUTHORIZED',
+  403: 'FORBIDDEN',
+  404: 'NOT_FOUND',
+  409: 'CONFLICT',
+  422: 'UNPROCESSABLE_ENTITY',
+  429: 'TOO_MANY_REQUESTS',
+};
+
+const HTTP_STATUS_TITLES: Record<number, string> = {
+  400: 'Bad Request',
+  401: 'Unauthorized',
+  403: 'Forbidden',
+  404: 'Not Found',
+  409: 'Conflict',
+  422: 'Unprocessable Entity',
+  429: 'Too Many Requests',
+  500: 'Internal Server Error',
+  502: 'Bad Gateway',
+  503: 'Service Unavailable',
+};
+
+@Catch()
+export class GlobalExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(GlobalExceptionFilter.name);
+  private readonly isTestEnvironment = process.env.NODE_ENV === 'test';
+  private readonly isProduction = process.env.NODE_ENV === 'production';
+
+  catch(exception: unknown, host: ArgumentsHost): void {
+    const ctx = host.switchToHttp();
+<% if (httpAdapter === 'express') { %>
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+<% } else { %>
+    const response = ctx.getResponse<FastifyReply>();
+    const request = ctx.getRequest<FastifyRequest>();
+<% } %>
+
+    const { status, body } = this.buildErrorResponse(exception, request);
+
+    if (!this.isTestEnvironment) {
+      this.logger.error(
+        `${request.method} ${request.url} - ${status} [${body.traceCode}]`,
+        exception instanceof Error ? exception.stack : undefined,
+      );
+    }
+
+<% if (httpAdapter === 'express') { %>
+    response.status(status).header('content-type', 'application/problem+json').json(body);
+<% } else { %>
+    void response.code(status).header('content-type', 'application/problem+json').send(body);
+<% } %>
+  }
+
+<% if (httpAdapter === 'express') { %>
+  private buildErrorResponse(exception: unknown, request: Request) {
+<% } else { %>
+  private buildErrorResponse(exception: unknown, request: FastifyRequest) {
+<% } %>
+    if (exception instanceof ApplicationError) {
+      const errorCode = exception.errorCode;
+      return {
+        status: exception.statusCode,
+        body: {
+          type: `urn:error:${errorCode.toLowerCase().replace(/_/g, '-')}`,
+          title: HTTP_STATUS_TITLES[exception.statusCode] ?? 'Error',
+          status: exception.statusCode,
+          detail: exception.message,
+          instance: request.url,
+          traceCode: exception.traceCode,
+          errorCode,
+          timestamp: new Date().toISOString(),
+          debugInformation: this.isProduction
+            ? null
+            : {
+                ...(exception.debugInfo ?? {}),
+                stack: exception.stack?.split('\n'),
+              },
+        },
+      };
+    }
+
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      const rawMessage =
+        typeof exceptionResponse === 'string'
+          ? exceptionResponse
+          : ((exceptionResponse as Record<string, unknown>).message ?? exception.message);
+      const detail = Array.isArray(rawMessage)
+        ? (rawMessage as string[]).join('; ')
+        : typeof rawMessage === 'string'
+          ? rawMessage
+          : exception.message;
+      const statusCode = exception.getStatus();
+      const errorCode = HTTP_STATUS_CODES[statusCode] ?? 'HTTP_ERROR';
+
+      return {
+        status: statusCode,
+        body: {
+          type: `urn:error:${errorCode.toLowerCase().replace(/_/g, '-')}`,
+          title: HTTP_STATUS_TITLES[statusCode] ?? 'Error',
+          status: statusCode,
+          detail,
+          instance: request.url,
+          traceCode: this.generateTraceCode(),
+          errorCode,
+          timestamp: new Date().toISOString(),
+          debugInformation: this.isProduction
+            ? null
+            : {
+                stack: exception instanceof Error ? exception.stack?.split('\n') : undefined,
+              },
+        },
+      };
+    }
+
+    return {
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      body: {
+        type: 'urn:error:internal-error',
+        title: 'Internal Server Error',
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        detail: 'Internal server error',
+        instance: request.url,
+        traceCode: this.generateTraceCode(),
+        errorCode: 'INTERNAL_ERROR',
+        timestamp: new Date().toISOString(),
+        debugInformation: this.isProduction
+          ? null
+          : {
+              stack: exception instanceof Error ? exception.stack?.split('\n') : undefined,
+            },
+      },
+    };
+  }
+
+  private generateTraceCode(): string {
+    return `ERR_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  }
+}

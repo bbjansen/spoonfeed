@@ -27,7 +27,13 @@ export default async function removeRecipeGenerator(
   }
 
   const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeedManifest;
+  const httpAdapter = manifest.httpAdapter ?? 'fastify';
+  const isExpress = httpAdapter === 'express';
   const recipeEntry = manifest.recipes[recipeId];
+
+  // Workspace-aware source paths
+  const isWorkspace = manifest.projectType === 'full-stack' || manifest.projectType === 'monorepo';
+  const srcPrefix = isWorkspace ? 'apps/api/src' : 'src';
 
   if (!recipeEntry) {
     throw new Error(
@@ -70,7 +76,11 @@ export default async function removeRecipeGenerator(
 
   // 4. Remove dependencies and devDependencies from package.json
   if (recipeDef) {
-    const depsToRemove = Object.keys(recipeDef.dependencies);
+    const depsToRemove = Object.keys(
+      isExpress && recipeDef.expressDependencies
+        ? recipeDef.expressDependencies
+        : recipeDef.dependencies,
+    );
     const devDepsToRemove = Object.keys(recipeDef.devDependencies);
 
     if (depsToRemove.length > 0 || devDepsToRemove.length > 0) {
@@ -80,7 +90,11 @@ export default async function removeRecipeGenerator(
       for (const otherId of otherRecipeIds) {
         const otherDef = registry.get(otherId as RecipeId);
         if (!otherDef) continue;
-        for (const dep of Object.keys(otherDef.dependencies)) sharedDeps.add(dep);
+        for (const dep of Object.keys(
+          isExpress && otherDef.expressDependencies
+            ? otherDef.expressDependencies
+            : otherDef.dependencies,
+        )) sharedDeps.add(dep);
         for (const dep of Object.keys(otherDef.devDependencies)) sharedDeps.add(dep);
       }
 
@@ -102,7 +116,7 @@ export default async function removeRecipeGenerator(
 
   // 5. Remove module import from app.module.ts
   if (recipeEntry.moduleImport) {
-    const appModulePath = 'src/app.module.ts';
+    const appModulePath = `${srcPrefix}/app.module.ts`;
     if (tree.exists(appModulePath)) {
       const content = tree.read(appModulePath, 'utf-8')!;
       const transformed = removeModuleImportFromString(
@@ -117,15 +131,17 @@ export default async function removeRecipeGenerator(
 
   // 6. Remove main.ts blocks and their imports
   if (recipeEntry.mainTsBlocks && recipeEntry.mainTsBlocks.length > 0) {
-    const mainTsPath = 'src/main.ts';
+    const mainTsPath = `${srcPrefix}/main.ts`;
     if (tree.exists(mainTsPath)) {
       let mainContent = tree.read(mainTsPath, 'utf-8')!;
 
       // Collect import module specifiers from the recipe definition
-      const importSpecifiers =
-        recipeDef?.mainTsSetup?.block?.imports?.map(
-          (imp: { moduleSpecifier: string }) => imp.moduleSpecifier,
-        ) ?? [];
+      const activeSetup = isExpress && recipeDef?.expressMainTsSetup
+        ? recipeDef.expressMainTsSetup
+        : recipeDef?.mainTsSetup;
+      const importSpecifiers = activeSetup?.block?.imports?.map(
+        (imp: { moduleSpecifier: string }) => imp.moduleSpecifier,
+      ) ?? [];
 
       for (const blockId of recipeEntry.mainTsBlocks) {
         mainContent = removeBlockFromString(mainContent, blockId, importSpecifiers);

@@ -1,3 +1,6 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'fs-extra';
 import { Tree, formatFiles, updateJson, logger } from '@nx/devkit';
 import type { AddRecipeGeneratorSchema } from './schema.js';
 import { RecipeRegistry } from '../../recipes/registry.js';
@@ -7,7 +10,10 @@ import type { ProjectType, RecipeDefinition, RecipeId } from '../../types.js';
 import { addModuleImportToString } from '../../utils/module-updater.js';
 import { insertBlockToString } from '../../utils/main-ts-updater.js';
 import type { BlockDefinition } from '../../utils/main-ts-updater.js';
+import { renderTemplate } from '../../generator/template-engine.js';
 import type { SpoonfeedManifest } from '../../utils/recipe-manifest.js';
+
+const generatorDir = path.dirname(fileURLToPath(import.meta.url));
 
 interface PackageJson {
   dependencies: Record<string, string>;
@@ -38,6 +44,11 @@ export default async function addRecipeGenerator(
   }
 
   const manifest = JSON.parse(tree.read(manifestPath, 'utf-8')!) as SpoonfeedManifest;
+  const httpAdapter = manifest.httpAdapter ?? 'fastify';
+
+  // Workspace-aware source paths
+  const isWorkspace = manifest.projectType === 'full-stack' || manifest.projectType === 'monorepo';
+  const srcPrefix = isWorkspace ? 'apps/api/src' : 'src';
 
   // Check if already installed
   if (manifest.recipes[recipeId]) {
@@ -53,6 +64,11 @@ export default async function addRecipeGenerator(
     throw new Error(
       `Recipe '${recipe.name}' is not compatible with project type '${manifest.projectType}'.`,
     );
+  }
+
+  // Validate adapter-specific constraints
+  if (recipeId === 'graphql-mercurius' && (manifest.httpAdapter ?? 'fastify') === 'express') {
+    throw new Error("Recipe 'graphql-mercurius' requires the Fastify HTTP adapter");
   }
 
   // Check conflicts
@@ -77,12 +93,16 @@ export default async function addRecipeGenerator(
     throw new Error('package.json not found. Is this a valid project?');
   }
 
+  const deps = httpAdapter === 'express' && recipe.expressDependencies
+    ? recipe.expressDependencies
+    : recipe.dependencies;
+
   if (
-    Object.keys(recipe.dependencies).length > 0 ||
+    Object.keys(deps).length > 0 ||
     Object.keys(recipe.devDependencies).length > 0
   ) {
     updateJson<PackageJson>(tree, 'package.json', (json) => {
-      json.dependencies = { ...json.dependencies, ...recipe.dependencies };
+      json.dependencies = { ...json.dependencies, ...deps };
       json.devDependencies = { ...json.devDependencies, ...recipe.devDependencies };
 
       // Sort alphabetically
@@ -98,17 +118,67 @@ export default async function addRecipeGenerator(
   }
 
   // 2. Copy recipe template files
-  // Note: In Phase 1, template file copying is handled externally.
-  // Phase 2 adds full AST transforms and template copying via generateFiles.
   const copiedFiles: string[] = [];
 
-  // Note: In Phase 1, we copy files manually since generateFiles expects a specific structure.
-  // Template files from the recipe dir are copied into the project root.
-  // Files named README.md and package-fragment.json are skipped.
+  if (recipe.templateDir) {
+    const templatesDir = path.resolve(generatorDir, '..', '..', '..', 'templates');
+    const recipeTemplateDir = path.join(templatesDir, 'recipes', recipe.templateDir);
+    const outputPrefix = isWorkspace ? 'apps/api' : '';
+    const templateData: Record<string, unknown> = {
+      name: manifest.name ?? '',
+      packageScope: manifest.scope ?? '',
+      projectType: manifest.projectType,
+      httpAdapter,
+    };
+
+    if (await fs.pathExists(recipeTemplateDir)) {
+      const copyRecursive = async (sourceDir: string, relativeBase: string): Promise<void> => {
+        const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+        for (const entry of entries) {
+          const sourcePath = path.join(sourceDir, entry.name);
+          let outputName = entry.name;
+
+          if (entry.isDirectory()) {
+            if (outputName.startsWith('dot-')) {
+              outputName = '.' + outputName.slice(4);
+            }
+            await copyRecursive(sourcePath, path.join(relativeBase, outputName));
+            continue;
+          }
+
+          // Skip package fragments and READMEs (handled separately)
+          if (outputName === 'package-fragment.json' || outputName === 'README.md') continue;
+
+          if (outputName.startsWith('dot-')) {
+            outputName = '.' + outputName.slice(4);
+          }
+
+          let fileContent: string | Buffer;
+          if (outputName.endsWith('.ejs')) {
+            outputName = outputName.replace(/\.ejs$/, '');
+            const template = await fs.readFile(sourcePath, 'utf-8');
+            fileContent = renderTemplate(template, templateData, sourcePath);
+          } else {
+            fileContent = await fs.readFile(sourcePath);
+          }
+
+          const relativePath = path.join(relativeBase, outputName);
+          const treePath = outputPrefix ? path.join(outputPrefix, relativePath) : relativePath;
+          tree.write(treePath, fileContent);
+          copiedFiles.push(treePath);
+        }
+      };
+
+      await copyRecursive(recipeTemplateDir, '');
+      if (copiedFiles.length > 0) {
+        logger.info(`  Copied ${copiedFiles.length} template file(s) for '${recipe.name}'`);
+      }
+    }
+  }
 
   // 2a. Add module import to app.module.ts (if recipe defines moduleImport)
   if (recipe.moduleImport) {
-    const appModulePath = 'src/app.module.ts';
+    const appModulePath = `${srcPrefix}/app.module.ts`;
     if (tree.exists(appModulePath)) {
       const content = tree.read(appModulePath, 'utf-8')!;
       const transformed = addModuleImportToString(
@@ -122,17 +192,20 @@ export default async function addRecipeGenerator(
   }
 
   // 2b. Insert main.ts blocks (if recipe defines mainTsSetup)
-  if (recipe.mainTsSetup) {
-    const mainTsPath = 'src/main.ts';
+  const setup = httpAdapter === 'express' && recipe.expressMainTsSetup
+    ? recipe.expressMainTsSetup
+    : recipe.mainTsSetup;
+  if (setup) {
+    const mainTsPath = `${srcPrefix}/main.ts`;
     if (tree.exists(mainTsPath)) {
       const content = tree.read(mainTsPath, 'utf-8')!;
       const transformed = insertBlockToString(
         content,
-        recipe.mainTsSetup.blockId,
-        recipe.mainTsSetup.block as BlockDefinition,
+        setup.blockId,
+        setup.block as BlockDefinition,
       );
       tree.write(mainTsPath, transformed);
-      logger.info(`  Inserted ${recipe.mainTsSetup.blockId} block into main.ts`);
+      logger.info(`  Inserted ${setup.blockId} block into main.ts`);
     }
   }
 
@@ -197,7 +270,7 @@ export default async function addRecipeGenerator(
       version: json.spoonfeedVersion ?? '0.0.1',
       files: copiedFiles,
       ...(recipe.moduleImport && { moduleImport: recipe.moduleImport }),
-      ...(recipe.mainTsSetup && { mainTsBlocks: [recipe.mainTsSetup.blockId] }),
+      ...(setup && { mainTsBlocks: [setup.blockId] }),
       ...(recipe.envVars.length > 0 && { envSection: recipe.name }),
     };
     return json;

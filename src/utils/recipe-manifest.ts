@@ -14,8 +14,13 @@ export interface RecipeManifestEntry {
 }
 
 export interface SpoonfeedManifest {
+  name?: string;
+  scope?: string;
   projectType: string;
   cloudProvider: string;
+  httpAdapter?: string;
+  transportLayer?: string;
+  frontendFramework?: string;
   spoonfeedVersion: string;
   generatedAt: string;
   recipes: Record<string, RecipeManifestEntry>;

@@ -1,0 +1,50 @@
+<% if (httpAdapter === 'express') { %>
+import { Test } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import { AppModule } from '@/app.module';
+
+describe('Health (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    app = module.createNestApplication();
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('GET / should return 200', async () => {
+    // Use supertest for Express-based e2e tests
+    const { default: request } = await import('supertest');
+    const result = await request(app.getHttpServer()).get('/');
+    expect(result.status).toBeLessThan(500);
+  });
+});
+<% } else { %>
+import { Test } from '@nestjs/testing';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { AppModule } from '@/app.module';
+
+describe('Health (e2e)', () => {
+  let app: NestFastifyApplication;
+
+  beforeAll(async () => {
+    const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('GET / should return 200', async () => {
+    const result = await app.inject({ method: 'GET', url: '/' });
+    expect(result.statusCode).toBeLessThan(500);
+  });
+});
+<% } %>

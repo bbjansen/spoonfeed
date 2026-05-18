@@ -1,9 +1,10 @@
 import path from 'node:path';
-import type { ProjectConfig, RecipeId, CloudProvider, ProjectType } from '../types.js';
+import type { ProjectConfig, RecipeId, CloudProvider, ProjectType, HttpAdapter } from '../types.js';
 import { RecipeRegistry } from '../recipes/registry.js';
 import { promptProjectName } from './project-name.js';
 import { promptProjectType } from './project-type.js';
 import { promptCloudProvider } from './cloud-provider.js';
+import { promptHttpAdapter } from './http-adapter.js';
 import { promptTransport } from './transport.js';
 import { promptFrontend } from './frontend.js';
 import { promptAddOns } from './add-ons.js';
@@ -59,6 +60,13 @@ export async function runAllPrompts(registry: RecipeRegistry): Promise<ProjectCo
   const projectType = await promptProjectType();
   const cloudProvider = await promptCloudProvider();
 
+  // HTTP adapter choice — only for project types that run an HTTP server
+  const httpProjectTypes = new Set(['http-api', 'aws-lambda', 'full-stack', 'monorepo']);
+  let httpAdapter: HttpAdapter = 'fastify';
+  if (httpProjectTypes.has(projectType)) {
+    httpAdapter = await promptHttpAdapter();
+  }
+
   let transportLayer: Awaited<ReturnType<typeof promptTransport>> | undefined = undefined;
   if (projectType === 'microservice') {
     transportLayer = await promptTransport();
@@ -85,6 +93,7 @@ export async function runAllPrompts(registry: RecipeRegistry): Promise<ProjectCo
     scope,
     projectType,
     cloudProvider,
+    httpAdapter,
     recipes,
     transportLayer,
     frontendFramework,

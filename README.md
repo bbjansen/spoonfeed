@@ -14,6 +14,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" />
   <img src="https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white" alt="Fastify" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
   <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonwebservices&logoColor=white" alt="AWS" />
@@ -59,7 +60,7 @@ Or with pnpm:
 pnpm dlx spoonfeed
 ```
 
-One command. The CLI walks you through project name, type, cloud provider, and recipe selection, then generates everything to disk.
+One command. The CLI walks you through project name, type, HTTP adapter (Fastify or Express), cloud provider, and recipe selection, then generates everything to disk.
 
 ## What It Looks Like
 
@@ -70,7 +71,7 @@ One command. The CLI walks you through project name, type, cloud provider, and r
 │  my-api
 │
 ◆  Project type
-│  ● HTTP REST API (Fastify)
+│  ● HTTP REST API
 │  ○ AWS Lambda
 │  ○ Microservice
 │  ○ CLI Application
@@ -80,6 +81,10 @@ One command. The CLI walks you through project name, type, cloud provider, and r
 │
 ◇  Cloud provider
 │  AWS
+│
+◆  HTTP adapter
+│  ● Fastify — High performance, schema-based validation
+│  ○ Express — Mature ecosystem, widest middleware support
 │
 ◆  Select recipes
 │  ◼ TypeORM + PostgreSQL
@@ -118,8 +123,8 @@ Seven project archetypes, each with tailored defaults, directory structure, and 
 
 | Type               | Description                                                  |
 | ------------------ | ------------------------------------------------------------ |
-| HTTP REST API      | Fastify adapter with validation, Swagger, and error handling |
-| AWS Lambda         | Serverless handler configured for Lambda deployments         |
+| HTTP REST API      | Fastify or Express adapter with validation, Swagger, and error handling |
+| AWS Lambda         | Serverless handler configured for Lambda deployments (Fastify or Express) |
 | Microservice       | Event-driven service with transport layer (TCP, NATS, etc.)  |
 | CLI Application    | Command-line tool built on nest-commander                    |
 | Scheduled Worker   | Cron-based background jobs with @nestjs/schedule             |
@@ -194,7 +199,7 @@ No runtime dependency on spoonfeed. The generated project is a standard NestJS a
 
 ### How It Works
 
-1. **Run the CLI** — Answer a few prompts: project name, type, cloud provider, recipes
+1. **Run the CLI** — Answer a few prompts: project name, type, HTTP adapter, cloud provider, recipes
 2. **Recipes resolve** — Dependencies, conflicts, and requirements are validated automatically
 3. **Project generates** — Source files, configs, environment variables, tests, and AI context are written to disk
 4. **Start building** — `cd` into the project, install, and run `pnpm start:dev`

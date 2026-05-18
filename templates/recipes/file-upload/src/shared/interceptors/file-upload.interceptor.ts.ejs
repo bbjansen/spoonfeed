@@ -1,0 +1,78 @@
+<% if (httpAdapter === 'express') { %>
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+  BadRequestException,
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import type { Request } from 'express';
+import multer from 'multer';
+
+const upload = multer({ storage: multer.memoryStorage() }).single('file');
+
+@Injectable()
+export class FileUploadInterceptor implements NestInterceptor {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
+    const request = context.switchToHttp().getRequest<Request>();
+    const response = context.switchToHttp().getResponse();
+
+    await new Promise<void>((resolve, reject) => {
+      upload(request, response, (err: unknown) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    if (!request.file) {
+      throw new BadRequestException('No file in request');
+    }
+
+    (request as any).uploadedFile = {
+      filename: request.file.originalname,
+      mimetype: request.file.mimetype,
+      encoding: '7bit',
+      buffer: request.file.buffer,
+      fieldname: request.file.fieldname,
+    };
+
+    return next.handle();
+  }
+}
+<% } else { %>
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+  BadRequestException,
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { FastifyRequest } from 'fastify';
+import '@fastify/multipart';
+
+@Injectable()
+export class FileUploadInterceptor implements NestInterceptor {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
+    const request = context.switchToHttp().getRequest<FastifyRequest>();
+
+    if (!request.isMultipart()) {
+      throw new BadRequestException('Expected multipart/form-data');
+    }
+
+    const file = await request.file();
+    if (!file) throw new BadRequestException('No file in request');
+
+    (request as any).uploadedFile = {
+      filename: file.filename,
+      mimetype: file.mimetype,
+      encoding: file.encoding,
+      file: file.file,
+      fieldname: file.fieldname,
+    };
+
+    return next.handle();
+  }
+}
+<% } %>

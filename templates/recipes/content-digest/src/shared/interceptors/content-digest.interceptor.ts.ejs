@@ -1,0 +1,27 @@
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { createHash } from 'node:crypto';
+<% if (httpAdapter === 'express') { %>
+import type { Response } from 'express';
+<% } else { %>
+import { FastifyReply } from 'fastify';
+<% } %>
+
+@Injectable()
+export class ContentDigestInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    return next.handle().pipe(
+      tap((data) => {
+        if (data === undefined || data === null) return;
+
+        const response = context.switchToHttp().getResponse<<% if (httpAdapter === 'express') { %>Response<% } else { %>FastifyReply<% } %>>();
+        const body = JSON.stringify(data);
+        const hash = createHash('sha-256').update(body).digest('base64');
+
+        void response.header('Content-Digest', `sha-256=:${hash}:`);
+        void response.header('Repr-Digest', `sha-256=:${hash}:`);
+      }),
+    );
+  }
+}

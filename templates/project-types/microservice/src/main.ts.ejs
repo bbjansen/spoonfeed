@@ -1,10 +1,66 @@
 import { NestFactory } from '@nestjs/core';
+<% if (transportLayer === 'grpc') { %>
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { join } from 'path';
+<% } else if (transportLayer === 'custom') { %>
 import { MicroserviceOptions } from '@nestjs/microservices';
+<% } else { %>
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+<% } %>
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-    // Transport configuration is injected by the selected transport recipe
+<% if (transportLayer === 'tcp') { %>
+    transport: Transport.TCP,
+    options: {
+      host: process.env.TCP_HOST ?? '0.0.0.0',
+      port: Number(process.env.TCP_PORT ?? 3001),
+    },
+<% } else if (transportLayer === 'redis') { %>
+    transport: Transport.REDIS,
+    options: {
+      host: process.env.REDIS_HOST ?? 'localhost',
+      port: Number(process.env.REDIS_PORT ?? 6379),
+    },
+<% } else if (transportLayer === 'nats') { %>
+    transport: Transport.NATS,
+    options: {
+      servers: [process.env.NATS_URL ?? 'nats://localhost:4222'],
+    },
+<% } else if (transportLayer === 'mqtt') { %>
+    transport: Transport.MQTT,
+    options: {
+      url: process.env.MQTT_URL ?? 'mqtt://localhost:1883',
+    },
+<% } else if (transportLayer === 'rabbitmq') { %>
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672'],
+      queue: process.env.RABBITMQ_QUEUE ?? '<%= name %>-queue',
+      queueOptions: { durable: true },
+    },
+<% } else if (transportLayer === 'kafka') { %>
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        clientId: '<%= name %>',
+        brokers: (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(','),
+      },
+      consumer: {
+        groupId: '<%= name %>-consumer',
+      },
+    },
+<% } else if (transportLayer === 'grpc') { %>
+    transport: Transport.GRPC,
+    options: {
+      package: '<%= name.replace(/-/g, '_') %>',
+      protoPath: join(__dirname, 'proto/<%= name %>.proto'),
+      url: process.env.GRPC_URL ?? '0.0.0.0:5000',
+    },
+<% } else { %>
+    // Custom transport — implement CustomTransportStrategy and configure here
+<% } %>
   });
 
   app.enableShutdownHooks();

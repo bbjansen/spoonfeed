@@ -26,6 +26,7 @@ function makeConfig(overrides: Partial<ProjectConfig>): ProjectConfig {
     scope: undefined,
     projectType: 'http-api',
     cloudProvider: 'none',
+    httpAdapter: 'fastify',
     recipes: [],
     transportLayer: undefined,
     frontendFramework: undefined,
