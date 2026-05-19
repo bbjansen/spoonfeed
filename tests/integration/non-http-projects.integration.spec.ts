@@ -499,8 +499,7 @@ describe('Recipe compatibleWith accuracy', () => {
   it('recipes with middleware templates that reference HTTP adapter types should not be compatibleWith:all', () => {
     // These recipes previously had compatibleWith: 'all' but their .ejs templates reference
     // HTTP-specific types (FastifyRequest/FastifyReply or Express Request/Response).
-    // correlation-id and request-logging are now FIXED (HTTP-only).
-    // distributed-tracing and multi-tenancy still have compatibleWith: 'all'.
+    // All four are now FIXED — restricted to HTTP-only project types.
     const recipesWithHttpMiddlewareTemplates = [
       'correlation-id',
       'request-logging',
@@ -521,13 +520,8 @@ describe('Recipe compatibleWith accuracy', () => {
       }
     }
 
-    // correlation-id and request-logging are now fixed (HTTP-only).
-    // Only distributed-tracing and multi-tenancy remain as known issues.
-    expect(violations.length).toBeGreaterThan(0);
-    expect(violations).toEqual([
-      "distributed-tracing: compatibleWith is 'all' but template generates HTTP middleware",
-      "multi-tenancy: compatibleWith is 'all' but template generates HTTP middleware",
-    ]);
+    // All four recipes are now correctly restricted to HTTP-only project types.
+    expect(violations).toEqual([]);
   });
 
   it('opentelemetry recipe is now HTTP-only but still adds HTTP-adapter-specific instrumentation', () => {

@@ -483,12 +483,9 @@ describe('add-recipe: workspace project paths', () => {
     expect(tree.exists('src/main.ts')).toBe(false);
   });
 
-  // BUG: No recipe currently defines `moduleImport`, so the moduleImport
-  // code path in the add-recipe generator (lines 119-131) is dead code.
-  // It can never be triggered in production. If a recipe is later added
-  // with moduleImport, it will use the workspace-aware srcPrefix, but
-  // this path has zero test coverage and zero production usage.
-  it('BUG: moduleImport code path is dead code (no recipes define moduleImport)', async () => {
+  // FIXED: moduleImport is now defined on many recipes, so the moduleImport
+  // code path in the add-recipe generator is no longer dead code.
+  it('moduleImport is used by recipes', async () => {
     const { RecipeRegistry } = await import('@spoonfeed/recipes/registry');
     const { registerAllRecipes } = await import(
       '@spoonfeed/recipes/definitions'
@@ -499,7 +496,7 @@ describe('add-recipe: workspace project paths', () => {
     const recipesWithModuleImport = registry
       .getAll()
       .filter((r) => r.moduleImport !== undefined);
-    expect(recipesWithModuleImport).toHaveLength(0);
+    expect(recipesWithModuleImport.length).toBeGreaterThan(0);
   });
 });
 

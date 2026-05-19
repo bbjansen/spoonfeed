@@ -967,7 +967,7 @@ describe('Terraform + cloud provider interactions', () => {
     registry = createRegistry();
   });
 
-  it('terraform with cloudProvider gcp still generates AWS-specific infrastructure', async () => {
+  it('terraform with cloudProvider gcp generates GCP-specific infrastructure', async () => {
     const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-tf-gcp-'));
     try {
       const config = makeConfig({
@@ -978,22 +978,21 @@ describe('Terraform + cloud provider interactions', () => {
       await generate(config, registry, TEMPLATES_DIR);
 
       const mainTf = readFile(outputDir, 'main.tf');
-      // BUG: Terraform templates are AWS-specific (ECS, S3 backend, ALB)
-      // regardless of the configured cloudProvider. When cloudProvider is 'gcp',
-      // the templates should generate GCP Cloud Run/GKE resources, not AWS ECS.
-      expect(mainTf).toContain('backend "s3"');
+      // FIXED: Terraform templates are now cloud-aware. GCP uses GCS backend.
+      expect(mainTf).toContain('backend "gcs"');
+      expect(mainTf).not.toContain('backend "s3"');
 
       const appMainTf = readFile(outputDir, 'modules/app/main.tf');
-      expect(appMainTf).toContain('aws_ecs_cluster');
-      expect(appMainTf).toContain('aws_ecs_service');
-      // No GCP resources despite cloudProvider: 'gcp'
-      expect(appMainTf).not.toContain('google_');
+      // GCP generates Cloud Run resources, not AWS ECS
+      expect(appMainTf).toContain('google_cloud_run_v2_service');
+      expect(appMainTf).not.toContain('aws_ecs_cluster');
+      expect(appMainTf).not.toContain('aws_ecs_service');
     } finally {
       fs.rmSync(outputDir, { recursive: true, force: true });
     }
   });
 
-  it('terraform with cloudProvider azure still generates AWS-specific infrastructure', async () => {
+  it('terraform with cloudProvider azure generates Azure-specific infrastructure', async () => {
     const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spoonfeed-tf-azure-'));
     try {
       const config = makeConfig({
@@ -1003,10 +1002,15 @@ describe('Terraform + cloud provider interactions', () => {
       });
       await generate(config, registry, TEMPLATES_DIR);
 
+      const mainTf = readFile(outputDir, 'main.tf');
+      // FIXED: Azure uses azurerm backend
+      expect(mainTf).toContain('backend "azurerm"');
+      expect(mainTf).not.toContain('backend "s3"');
+
       const appMainTf = readFile(outputDir, 'modules/app/main.tf');
-      // BUG: Same as GCP - terraform is all AWS ECS, no Azure resources
-      expect(appMainTf).toContain('aws_ecs_cluster');
-      expect(appMainTf).not.toContain('azurerm_');
+      // Azure generates Container Apps resources, not AWS ECS
+      expect(appMainTf).toContain('azurerm_container_app');
+      expect(appMainTf).not.toContain('aws_ecs_cluster');
     } finally {
       fs.rmSync(outputDir, { recursive: true, force: true });
     }
