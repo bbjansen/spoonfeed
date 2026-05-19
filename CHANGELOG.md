@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.4](https://github.com/bbjansen/spoonfeed/compare/spoonfeed-v0.2.3...spoonfeed-v0.2.4) (2026-05-19)
+
+
+### Bug Fixes
+
+* update tests for removed infrastructure scaffolding dirs ([508cddb](https://github.com/bbjansen/spoonfeed/commit/508cddb98fb55eddd8512b746997d7c1ac5cf0b4))
+
 ## [0.2.3](https://github.com/bbjansen/spoonfeed/compare/spoonfeed-v0.2.2...spoonfeed-v0.2.3) (2026-05-19)
 
 
