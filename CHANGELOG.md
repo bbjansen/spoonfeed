@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.3](https://github.com/bbjansen/spoonfeed/compare/spoonfeed-v0.2.2...spoonfeed-v0.2.3) (2026-05-19)
+
+
+### Bug Fixes
+
+* add missing amqp-connection-manager peer dep to rabbitmq recipe ([5111877](https://github.com/bbjansen/spoonfeed/commit/51118771bb7870f8b97c080f84de77c5aea65909))
+* remove empty infrastructure scaffolding dirs from base template ([dbb5d0a](https://github.com/bbjansen/spoonfeed/commit/dbb5d0a95006bdfcad60451f1c3adfa9a1029a03))
+
 ## [0.2.2](https://github.com/bbjansen/spoonfeed/compare/spoonfeed-v0.2.1...spoonfeed-v0.2.2) (2026-05-19)
 
 
