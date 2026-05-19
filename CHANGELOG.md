@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.2](https://github.com/bbjansen/spoonfeed/compare/spoonfeed-v0.2.1...spoonfeed-v0.2.2) (2026-05-19)
+
+
+### Features
+
+* initial release of spoonfeeder nestjs scaffolder ([aacfb8e](https://github.com/bbjansen/spoonfeed/commit/aacfb8e2e8234b94aee2df5fc53923b093569e6d))
+* prepare v0.1.0 for public release ([ef87cee](https://github.com/bbjansen/spoonfeed/commit/ef87cee78606dc712c1c43b76054fe8f5f57bec2))
+* rename to spoonfeed, fix monorepo/full-stack start ([b018389](https://github.com/bbjansen/spoonfeed/commit/b018389d34350181b4d744b69b456f5c9de21a3e))
+* wire 46 recipe modules into app.module.ts via moduleImport ([c623539](https://github.com/bbjansen/spoonfeed/commit/c62353964ae24d3de027173b1919d598558f8e51))
+
+
+### Bug Fixes
+
+* correct non-existent npm versions for grpc and mqtt transport deps ([03460f6](https://github.com/bbjansen/spoonfeed/commit/03460f6657f1f0da15509ab3dcf66c30d3503672))
+* cover "never touched" areas — terraform, migrate, list, post-generate, cross-cloud ([2604fcb](https://github.com/bbjansen/spoonfeed/commit/2604fcbc83363f62244ed800d81f4cf33f6b356e))
+* create 8 service module wrappers, restrict 2 middleware recipes, replace deprecated package ([175910a](https://github.com/bbjansen/spoonfeed/commit/175910a1fea29d02ad3d5df608dd86badcec2470))
+* generate project in current directory instead of parent ([#1](https://github.com/bbjansen/spoonfeed/issues/1)) ([7a3acb6](https://github.com/bbjansen/spoonfeed/commit/7a3acb69f6f530692200b926d52d7870f54b152b))
+* rebuild dist/ before publish — stale compiled JS caused httpAdapter undefined in templates ([15e77bb](https://github.com/bbjansen/spoonfeed/commit/15e77bb424e0a5272bbfa4ecb076ae154fa7863f))
+* resolve 39 cross-stack generator bugs, add 2021 integration tests ([8066555](https://github.com/bbjansen/spoonfeed/commit/8066555067454ec0448ff118a68bf2a53b60caea))
+* resolve 4 template bugs found by deep matrix (every recipe x both adapters) ([126749c](https://github.com/bbjansen/spoonfeed/commit/126749cd3c157c4b9a7f95980c3354d65951082f))
+* resolve 6 generated test template bugs ([09660a0](https://github.com/bbjansen/spoonfeed/commit/09660a02773c8e40222c23377841cea55d6cb0f7))
+* resolve 6 recipe type errors (sendgrid, docs-site, gcp-logging, azure-entra-id, serialization-groups, file-upload) ([bee4677](https://github.com/bbjansen/spoonfeed/commit/bee46770668a4efb319d2d47736923c2a5b0b2f0))
+* resolve 8 add/remove-recipe lifecycle bugs ([2e8f575](https://github.com/bbjansen/spoonfeed/commit/2e8f5759b9158a2777bb441f1ec211d5d2f20210))
+* update 6 test expectations for terraform multi-cloud, env dedup, and moduleImport changes ([447cbf7](https://github.com/bbjansen/spoonfeed/commit/447cbf744439bee05ec8bea519551268e2f95285))
+
 ## [0.2.0] — 2026-05-19
 
 ### Added
