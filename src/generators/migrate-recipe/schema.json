@@ -8,11 +8,13 @@
     "from": {
       "type": "string",
       "description": "Recipe ID to remove (currently installed)",
+      "$default": { "$source": "argv", "index": 0 },
       "x-prompt": "Which recipe do you want to migrate FROM?"
     },
     "to": {
       "type": "string",
       "description": "Recipe ID to add (replacement)",
+      "$default": { "$source": "argv", "index": 1 },
       "x-prompt": "Which recipe do you want to migrate TO?"
     }
   },

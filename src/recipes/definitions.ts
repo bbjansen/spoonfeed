@@ -25,6 +25,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'typeorm-postgres',
+    moduleImport: { moduleName: 'DatabaseModule', importPath: '@/infrastructure/database/database.module' },
     claudeMdSection: [
       '## TypeORM + PostgreSQL',
       'Entities live in `src/<module>/entities/`. Use migrations for schema changes — never `synchronize: true` in production.',
@@ -61,6 +62,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'typeorm-mysql',
+    moduleImport: { moduleName: 'DatabaseModule', importPath: '@/infrastructure/database/database.module' },
     claudeMdSection: [
       '## TypeORM + MySQL',
       'Entities live in `src/<module>/entities/`. Use migrations for schema changes — never `synchronize: true` in production.',
@@ -132,6 +134,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'mongoose',
+    moduleImport: { moduleName: 'DatabaseModule', importPath: '@/infrastructure/database/database.module' },
     claudeMdSection: [
       '## Mongoose',
       'Schemas live in `src/<module>/schemas/`. Use @Schema() and @Prop() decorators.',
@@ -170,6 +173,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'drizzle-postgres',
+    moduleImport: { moduleName: 'DrizzleModule', importPath: '@/infrastructure/database/drizzle.module' },
     claudeMdSection: [
       '## Drizzle ORM',
       'Schema in `src/infrastructure/database/schema/`. Run `pnpm drizzle:generate` after schema changes, then `pnpm drizzle:migrate`.',
@@ -212,6 +216,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'kysely',
+    moduleImport: { moduleName: 'DatabaseModule', importPath: '@/infrastructure/database/database.module' },
     claudeMdSection:
       '## Kysely\nType-safe SQL query builder. Define database types in `src/infrastructure/database/types.ts`. Use the db instance for queries. Migrations via kysely-ctl.',
     cursorRules:
@@ -244,6 +249,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'mikro-orm',
+    moduleImport: { moduleName: 'DatabaseModule', importPath: '@/infrastructure/database/database.module' },
     claudeMdSection:
       '## MikroORM\nEntities in `src/infrastructure/database/entities/`. Uses Unit of Work pattern — changes are flushed via `em.flush()`. Run `pnpm mikro-orm migration:create` for migrations.',
     cursorRules:
@@ -281,6 +287,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
       'full-stack',
     ],
     templateDir: 'redis-cache',
+    moduleImport: { moduleName: 'CacheModule', importPath: '@/infrastructure/cache/cache.module' },
     claudeMdSection: [
       '## Redis Cache',
       'Use @UseInterceptors(CacheInterceptor) for automatic route caching or inject CACHE_MANAGER directly.',
@@ -327,6 +334,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
       'full-stack',
     ],
     templateDir: 'rabbitmq',
+    moduleImport: { moduleName: 'QueueModule', importPath: '@/infrastructure/queue/queue.module' },
     claudeMdSection: [
       '## RabbitMQ',
       'Use @MessagePattern() for request/response and @EventPattern() for fire-and-forget.',
@@ -366,6 +374,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
       'full-stack',
     ],
     templateDir: 'bullmq',
+    moduleImport: { moduleName: 'QueueModule', importPath: '@/infrastructure/queue/queue.module' },
     claudeMdSection: [
       '## BullMQ',
       'Define processors with @Processor() and handle jobs with @WorkerHost. Add jobs via inject Queue.',
@@ -494,6 +503,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: ['jwt-auth'],
     compatibleWith: ['http-api', 'full-stack', 'monorepo'],
     templateDir: 'auth-flows',
+    moduleImport: { moduleName: 'AuthFlowModule', importPath: '@/app/modules/auth/auth.module' },
     claudeMdSection: [
       '## Auth Flows',
       'AuthService handles signup, login, email verification, and password reset.',
@@ -684,6 +694,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'pino',
+    moduleImport: { moduleName: 'LoggerModule', importPath: '@/infrastructure/logging/logger.module' },
     claudeMdSection: [
       '## Pino Logger',
       'Use `PinoLogger` (injected) for structured logging. Logs are JSON in production, pretty-printed in dev.',
@@ -713,6 +724,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'winston',
+    moduleImport: { moduleName: 'LoggerModule', importPath: '@/infrastructure/logging/logger.module' },
     claudeMdSection: [
       '## Winston Logger',
       'Winston is configured with console and file transports. Inject `WINSTON_MODULE_PROVIDER` for the logger.',
@@ -743,6 +755,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'health-checks',
+    moduleImport: { moduleName: 'HealthModule', importPath: '@/shared/health/health.module' },
     claudeMdSection: [
       '## Health Checks',
       'GET `/health` returns service health. Add custom indicators by implementing HealthIndicator.',
@@ -777,6 +790,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'prometheus',
+    moduleImport: { moduleName: 'MetricsModule', importPath: '@/infrastructure/metrics/metrics.module' },
     claudeMdSection: [
       '## Prometheus Metrics',
       'Metrics are exposed at `/{METRICS_PATH}`. Default metrics are collected automatically.',
@@ -819,6 +833,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'sentry',
+    moduleImport: { moduleName: 'SentryModule', importPath: '@/infrastructure/sentry/sentry.module' },
     claudeMdSection: [
       '## Sentry',
       'Sentry captures unhandled exceptions and performance data. Configure via SENTRY_DSN.',
@@ -895,6 +910,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 's3-minio',
+    moduleImport: { moduleName: 'StorageModule', importPath: '@/infrastructure/storage/storage.module' },
     claudeMdSection: [
       '## S3 / MinIO Storage',
       'Use StorageService for file uploads, downloads, and presigned URLs.',
@@ -939,6 +955,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'nodemailer',
+    moduleImport: { moduleName: 'MailModule', importPath: '@/infrastructure/notifications/mail.module' },
     claudeMdSection: [
       '## Nodemailer',
       'Inject MailerService to send emails. Templates live in `src/mail/templates/`.',
@@ -1039,6 +1056,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'graphql-mercurius',
+    moduleImport: { moduleName: 'GraphqlModule', importPath: '@/infrastructure/graphql/graphql.module' },
     claudeMdSection: [
       '## GraphQL (Mercurius)',
       'Code-first approach: define @ObjectType() and @Resolver() classes. Schema is auto-generated.',
@@ -1907,6 +1925,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/sqs',
+    moduleImport: { moduleName: 'SqsModule', importPath: '@/infrastructure/aws/sqs.module' },
     claudeMdSection: [
       '## AWS SQS',
       'Use SqsService to send and receive messages. Configure queue URL via SQS_QUEUE_URL.',
@@ -1938,6 +1957,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/sns',
+    moduleImport: { moduleName: 'SnsModule', importPath: '@/infrastructure/aws/sns.module' },
     claudeMdSection: [
       '## AWS SNS',
       'Use SnsService to publish messages to topics. Configure topic ARN via SNS_TOPIC_ARN.',
@@ -1969,6 +1989,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/eventbridge',
+    moduleImport: { moduleName: 'EventBridgeModule', importPath: '@/infrastructure/aws/eventbridge.module' },
     claudeMdSection: [
       '## AWS EventBridge',
       'Use EventBridgeService to put events on the bus. Configure bus name via EVENTBRIDGE_BUS_NAME.',
@@ -1997,6 +2018,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/secrets-manager',
+    moduleImport: { moduleName: 'SecretsModule', importPath: '@/infrastructure/aws/secrets.module' },
     claudeMdSection: [
       '## AWS Secrets Manager',
       'Use SecretsService to fetch secrets at startup. Secrets are cached to reduce API calls.',
@@ -2028,6 +2050,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/ssm',
+    moduleImport: { moduleName: 'SsmModule', importPath: '@/infrastructure/aws/ssm.module' },
     claudeMdSection: [
       '## AWS SSM Parameter Store',
       'Use SsmService to load parameters by path prefix at bootstrap.',
@@ -2060,6 +2083,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/s3',
+    moduleImport: { moduleName: 'S3Module', importPath: '@/infrastructure/aws/s3.module' },
     claudeMdSection: [
       '## AWS S3',
       'Use S3Service for uploads, downloads, and presigned URLs.',
@@ -2093,6 +2117,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/cognito',
+    moduleImport: { moduleName: 'CognitoModule', importPath: '@/infrastructure/aws/cognito.module' },
     claudeMdSection: [
       '## AWS Cognito',
       'Use CognitoAuthGuard to validate Cognito JWT tokens on protected routes.',
@@ -2128,6 +2153,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/cloudwatch',
+    moduleImport: { moduleName: 'CloudWatchModule', importPath: '@/infrastructure/aws/cloudwatch.module' },
     claudeMdSection: [
       '## AWS CloudWatch Logs',
       'Application logs are shipped to CloudWatch Logs. Configure log group via CLOUDWATCH_LOG_GROUP.',
@@ -2197,6 +2223,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/dynamodb',
+    moduleImport: { moduleName: 'DynamoDbModule', importPath: '@/infrastructure/aws/dynamodb.module' },
     claudeMdSection: [
       '## AWS DynamoDB',
       'Use DynamoDbService for CRUD operations. Table name is configured via DYNAMODB_TABLE_NAME.',
@@ -2232,6 +2259,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/elasticache',
+    moduleImport: { moduleName: 'RedisModule', importPath: '@/infrastructure/aws/redis.module' },
     claudeMdSection: [
       '## AWS ElastiCache',
       'ElastiCache Redis is used for caching. Connect via ELASTICACHE_ENDPOINT.',
@@ -2272,6 +2300,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-aws/cloudfront',
+    moduleImport: { moduleName: 'CloudFrontModule', importPath: '@/infrastructure/aws/cloudfront.module' },
     claudeMdSection: [
       '## AWS CloudFront',
       'Use CloudFrontService to generate signed URLs and invalidate caches.',
@@ -2306,6 +2335,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-gcp/pubsub',
+    moduleImport: { moduleName: 'PubSubModule', importPath: '@/infrastructure/gcp/pubsub.module' },
     claudeMdSection: [
       '## GCP Pub/Sub',
       'Use PubSubService to publish and subscribe to messages. Configure topic and subscription via env.',
@@ -2334,6 +2364,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-gcp/secret-manager',
+    moduleImport: { moduleName: 'GcpSecretsModule', importPath: '@/infrastructure/gcp/secrets.module' },
     claudeMdSection: [
       '## GCP Secret Manager',
       'Use GcpSecretsService to fetch secrets at startup. Secrets are cached to reduce API calls.',
@@ -2365,6 +2396,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-gcp/cloud-storage',
+    moduleImport: { moduleName: 'GcsStorageModule', importPath: '@/infrastructure/gcp/storage.module' },
     claudeMdSection: [
       '## GCP Cloud Storage',
       'Use GcsStorageService for file uploads, downloads, and signed URLs.',
@@ -2435,6 +2467,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-gcp/firebase-auth',
+    moduleImport: { moduleName: 'FirebaseAuthModule', importPath: '@/infrastructure/gcp/firebase-auth.module' },
     claudeMdSection: [
       '## GCP Firebase Auth',
       'Use FirebaseAuthGuard to validate Firebase ID tokens on protected routes.',
@@ -2466,6 +2499,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-gcp/cloud-logging',
+    moduleImport: { moduleName: 'CloudLoggingModule', importPath: '@/infrastructure/gcp/logging.module' },
     claudeMdSection: [
       '## GCP Cloud Logging',
       'Application logs are shipped to Cloud Logging. Configure log name via GCP_LOG_NAME.',
@@ -2541,6 +2575,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-gcp/firestore',
+    moduleImport: { moduleName: 'FirestoreModule', importPath: '@/infrastructure/gcp/firestore.module' },
     claudeMdSection: [
       '## GCP Firestore',
       'Use FirestoreService for document CRUD operations. Configure database ID via FIRESTORE_DATABASE_ID.',
@@ -2572,6 +2607,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-gcp/memorystore',
+    moduleImport: { moduleName: 'RedisModule', importPath: '@/infrastructure/gcp/redis.module' },
     claudeMdSection: [
       '## GCP Memorystore',
       'Memorystore Redis is used for caching. Connect via MEMORYSTORE_HOST.',
@@ -2640,6 +2676,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-azure/service-bus',
+    moduleImport: { moduleName: 'ServiceBusModule', importPath: '@/infrastructure/azure/service-bus.module' },
     claudeMdSection: [
       '## Azure Service Bus',
       'Use ServiceBusService to send and receive messages. Configure connection string via env.',
@@ -2675,6 +2712,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-azure/key-vault',
+    moduleImport: { moduleName: 'KeyVaultModule', importPath: '@/infrastructure/azure/key-vault.module' },
     claudeMdSection: [
       '## Azure Key Vault',
       'Use KeyVaultService to fetch secrets at startup. Secrets are cached to reduce API calls.',
@@ -2715,6 +2753,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-azure/blob-storage',
+    moduleImport: { moduleName: 'BlobStorageModule', importPath: '@/infrastructure/azure/blob-storage.module' },
     claudeMdSection: [
       '## Azure Blob Storage',
       'Use BlobStorageService for uploads, downloads, and SAS URL generation.',
@@ -2790,6 +2829,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-azure/entra-id',
+    moduleImport: { moduleName: 'EntraIdModule', importPath: '@/infrastructure/azure/entra-id.module' },
     claudeMdSection: [
       '## Azure Entra ID',
       'Use EntraIdGuard to validate Entra ID JWT tokens on protected routes.',
@@ -2824,6 +2864,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-azure/app-insights',
+    moduleImport: { moduleName: 'AppInsightsModule', importPath: '@/infrastructure/azure/app-insights.module' },
     claudeMdSection: [
       '## Azure Application Insights',
       'Application Insights collects telemetry, traces, and exceptions automatically.',
@@ -2861,6 +2902,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-azure/cosmos-db',
+    moduleImport: { moduleName: 'CosmosDbModule', importPath: '@/infrastructure/azure/cosmos-db.module' },
     claudeMdSection: [
       '## Azure Cosmos DB',
       'Use CosmosDbService for container and item operations. Configure endpoint and key via env.',
@@ -2933,6 +2975,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'cloud-azure/cache',
+    moduleImport: { moduleName: 'RedisModule', importPath: '@/infrastructure/azure/redis.module' },
     claudeMdSection: [
       '## Azure Cache for Redis',
       'Azure Cache for Redis is used for caching. Connect via AZURE_REDIS_HOST with TLS on port 6380.',
@@ -3210,6 +3253,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'request-context',
+    moduleImport: { moduleName: 'RequestContextModule', importPath: '@/shared/context/request-context.module' },
     claudeMdSection: [
       '## Request Context (CLS)',
       'Import RequestContextModule to enable AsyncLocalStorage-based request context.',
@@ -3240,6 +3284,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'full-stack', 'monorepo'],
     templateDir: 'i18n',
+    moduleImport: { moduleName: 'InternationalizationModule', importPath: '@/shared/i18n/i18n.module' },
     claudeMdSection: [
       '## Internationalization (i18n)',
       'Uses nestjs-i18n for multi-language support. Translation files live in `src/i18n/<lang>/`.',
@@ -3773,6 +3818,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'full-stack', 'monorepo'],
     templateDir: 'adminjs',
+    moduleImport: { moduleName: 'AdminModule', importPath: '@/app/modules/admin/admin.module' },
     claudeMdSection:
       '## AdminJS\nAdmin panel available at /admin. Register resources in admin.module.ts. Authentication uses ADMIN_EMAIL/ADMIN_PASSWORD env vars.',
     cursorRules:

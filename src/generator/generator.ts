@@ -14,6 +14,7 @@ import {
 } from './ai-context-assembler.js';
 import { insertBlockToString } from '../utils/main-ts-updater.js';
 import type { BlockDefinition } from '../utils/main-ts-updater.js';
+import { addModuleImportToString } from '../utils/module-updater.js';
 
 async function copyAndRenderDir(
   sourceDir: string,
@@ -273,6 +274,24 @@ export async function generate(
         }
       }
       await fs.writeFile(mainTsPath, mainTsContent, 'utf-8');
+    }
+
+    // 4d. Apply recipe module imports to app.module.ts
+    const appModulePath = isWorkspaceProject
+      ? path.join(outputDir, 'apps', 'api', 'src', 'app.module.ts')
+      : path.join(outputDir, 'src', 'app.module.ts');
+    if (await fs.pathExists(appModulePath)) {
+      let appModuleContent = await fs.readFile(appModulePath, 'utf-8');
+      for (const recipe of selectedRecipes) {
+        if (recipe.moduleImport) {
+          appModuleContent = addModuleImportToString(
+            appModuleContent,
+            recipe.moduleImport.moduleName,
+            recipe.moduleImport.importPath,
+          );
+        }
+      }
+      await fs.writeFile(appModulePath, appModuleContent, 'utf-8');
     }
 
     // 5. Copy deployment templates
