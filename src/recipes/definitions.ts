@@ -99,6 +99,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'prisma',
+    moduleImport: { moduleName: 'PrismaModule', importPath: '@/infrastructure/database/prisma.module' },
     claudeMdSection: [
       '## Prisma',
       'Schema lives in `prisma/schema.prisma`. Run `pnpm prisma generate` after schema changes.',
@@ -991,6 +992,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'sendgrid',
+    moduleImport: { moduleName: 'SendgridModule', importPath: '@/infrastructure/notifications/sendgrid.module' },
     claudeMdSection: [
       '## SendGrid',
       'Use EmailService to send transactional emails via SendGrid. Set SENDGRID_API_KEY in env.',
@@ -1506,7 +1508,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     envVars: [],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'distributed-tracing',
     claudeMdSection: [
       '## Distributed Tracing',
@@ -1650,6 +1652,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'graceful-shutdown',
+    moduleImport: { moduleName: 'ShutdownModule', importPath: '@/shared/lifecycle/shutdown.module' },
     claudeMdSection: [
       '## Graceful Shutdown',
       'SIGTERM/SIGINT trigger graceful shutdown. In-flight requests complete before exit.',
@@ -1728,6 +1731,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: 'all',
     templateDir: 'feature-flags',
+    moduleImport: { moduleName: 'FeatureFlagModule', importPath: '@/shared/services/feature-flag.module' },
     claudeMdSection: [
       '## Feature Flags',
       'Use FeatureFlagService.isEnabled("flag-name") to check flags. Flags are config-based.',
@@ -1758,7 +1762,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     ],
     conflicts: [],
     requires: [],
-    compatibleWith: 'all',
+    compatibleWith: ['http-api', 'aws-lambda', 'full-stack', 'monorepo'],
     templateDir: 'multi-tenancy',
     claudeMdSection: [
       '## Multi-Tenancy',
@@ -1783,7 +1787,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     category: 'Repo Hygiene',
     dependencies: {},
     devDependencies: {
-      'conventional-changelog-cli': '5.0.0',
+      'conventional-changelog': '7.2.0',
     },
     envVars: [],
     conflicts: [],
@@ -3335,6 +3339,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'microservice', 'scheduled-worker', 'monorepo', 'full-stack'],
     templateDir: 'dead-letter-queue',
+    moduleImport: { moduleName: 'DlqModule', importPath: '@/infrastructure/queue/dlq.module' },
     claudeMdSection: [
       '## Dead Letter Queue',
       'Failed messages are routed to a DLQ via `DeadLetterQueueService`. Inspect and replay dead letters through the service API.',
@@ -3365,6 +3370,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'full-stack', 'monorepo'],
     templateDir: 'webhooks',
+    moduleImport: { moduleName: 'WebhookModule', importPath: '@/infrastructure/webhooks/webhook.module' },
     claudeMdSection: [
       '## Webhook Delivery',
       'Outbound webhooks are sent via `WebhookService`. Payloads are HMAC-signed with SHA-256 using the `WEBHOOK_SECRET` env var.',
@@ -3450,6 +3456,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'microservice', 'scheduled-worker', 'full-stack', 'monorepo'],
     templateDir: 'transactional-outbox',
+    moduleImport: { moduleName: 'OutboxModule', importPath: '@/infrastructure/outbox/outbox.module' },
     claudeMdSection: [
       '## Transactional Outbox',
       'Use OutboxService.addMessage() within a transaction to guarantee at-least-once event delivery.',
@@ -3767,6 +3774,7 @@ export const recipeDefinitions: RecipeDefinition[] = [
     requires: [],
     compatibleWith: ['http-api', 'full-stack', 'monorepo'],
     templateDir: 'mfa-totp',
+    moduleImport: { moduleName: 'TotpModule', importPath: '@/shared/auth/totp.module' },
     claudeMdSection: [
       '## Two-Factor Authentication (TOTP)',
       'Use `TotpService` to generate secrets, QR codes, and verify TOTP tokens.',
